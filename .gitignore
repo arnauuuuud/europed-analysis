@@ -1,0 +1,5 @@
+# ignore pyc and workspace
+*.pyc
+*workspace*
+*.sh
+*0
