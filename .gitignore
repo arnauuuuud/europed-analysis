@@ -4,3 +4,4 @@
 *.sh
 *0
 */old/*
+*_pycache*
