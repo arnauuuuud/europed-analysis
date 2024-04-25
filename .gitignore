@@ -5,10 +5,10 @@
 *0
 */old/*
 *_pycache*
-cartoon/time
-cartoon/psutil
-cartoon/subprocess
-cartoon/time
-cartoon/plt
-cartoon/cm
+plotting_routines/time
+plotting_routines/psutil
+plotting_routines/subprocess
+plotting_routines/time
+plotting_routines/plt
+plotting_routines/cm
 hoho/importlib
