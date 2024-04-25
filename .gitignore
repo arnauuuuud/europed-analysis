@@ -12,3 +12,5 @@ plotting_routines/time
 plotting_routines/plt
 plotting_routines/cm
 hoho/importlib
+thesis/*
+pylib/*
