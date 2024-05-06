@@ -13,20 +13,17 @@ import numpy as np
 
 def main():
     
-    consid_mode_input = ['1', '2', '3', '4', '5', '7', '10', '20', '30', '40', '50']
-    euroname_bas1 = []
-    euroname_var1 = []
-    euroname_bas2 = []
-    euroname_var2 = []
-    lastname = ['']
-    firsname = ''
-    middname = ''
+    consid_mode = {'1':False,'2':False, '3':False, '4':False, '5':False, '7':False, '10':False, '20':False, '30':False, '40':False, '50':False}
+    euroname_1 = []
+    euroname_2 = []
+    euroname_3 = []
+    euroname_4 = []
+    checkbox_envelope_ = [False]
+    crit_value = 0.03
     filter_wrong_slope = True
 
-    list_legends = {}
 
 
-    crit_value= 0.03
     crit = 'alfven'
     plot_hline = True
     plot_vline = True
@@ -42,7 +39,7 @@ def main():
     ax_textbox_1 = plt.subplot(gs[0,1:]) 
     euroname_1 = TextBox(ax_textbox_1, '', initial='f4_eta')
     def update_euroname_1(val):
-        euroname_bas1 = val.split(',')
+        euroname_1[0] = val.split(',')
     euroname_1.on_submit(update_euroname_1)
 
 
@@ -50,7 +47,7 @@ def main():
     ax_textbox_2 = plt.subplot(gs[1,1:]) 
     euroname_2 = TextBox(ax_textbox_2, '', initial='0,1,2')
     def update_euroname_2(val):
-        euroname_var1 = val.split(',')
+        euroname_2[0] = val.split(',')
     euroname_2.on_submit(update_euroname_2)
 
 
@@ -58,7 +55,7 @@ def main():
     ax_textbox_3 = plt.subplot(gs[2,1:]) 
     euroname_3 = TextBox(ax_textbox_3, '', initial='_ds')
     def update_euroname_3(val):
-        euroname_bas2 = val.split(',')
+        euroname_3[0] = val.split(',')
     euroname_3.on_submit(update_euroname_3)
 
 
@@ -66,138 +63,65 @@ def main():
     ax_textbox_4 = plt.subplot(gs[3,1:]) 
     euroname_4 = TextBox(ax_textbox_4, '', initial='0')
     def update_euroname_4(val):
-        euroname_var2 = val.split(',')
+        euroname_4[0] = val.split(',')
     euroname_4.on_submit(update_euroname_4)
-   
-    
-    
-    # ax_checkbox_mode_bis = plt.subplot(gs[3:5,2]) 
-    # ax_checkbox_dshift = plt.subplot(gs[1:3,1])
-    # ax_radiobutton_crit = plt.subplot(gs[5,2])
-    # ax_critvalue = plt.subplot(gs[5,1])
-    # ax_radiobutton_xaxis = plt.subplot(gs[1:3,2])
-    # ax_checkbox_run = plt.subplot(gs[6,1:])
 
 
-
-    # checkboxes_mode = {}
-    # list_mode = ['1','2','3','4','5','7','10','20','30','40','50']
-    # checkbox_states_mode = {mode: mode in consid_mode_input for mode in list_mode}
-    # consid_mode_input_list = [consid_mode_input]
-
-    # checkboxes_dshift = {}
-    # list_dshift = ['-0.0100','-0.0050','0.0000','0.0050','0.0100','0.0200','0.0300']
-    # list_dshift_label = [str(float(dshift)*100)+'%' for dshift in list_dshift]
-    # checkbox_states_dshift = {str(float(dshift)*100)+'%': dshift in lastname for dshift in list_dshift}
-    # lastname_list = [lastname]
-
-    # checkboxes_eta = {}
-    # list_eta = ['0','1','2']
-    # checkbox_states_eta = {eta: eta in europed_runs for eta in list_eta}
-
-    # filter_wrong_slope_list = [filter_wrong_slope]
-    # plot_hline_list = [plot_hline]
-    # plot_vline_list = [plot_vline]
-    # x_parameter_list = [x_parameter]
-    # crit_value_list = [crit_value]
-    # crit_list = [crit]
-
-    # def add_element_mode(label):
-    #     checkbox_states_mode[label] = not checkbox_states_mode[label]
-    #     if checkbox_states_mode[label]:
-    #         consid_mode_input_list[0].append(label)
-    #         consid_mode_input_list[0] = sorted(consid_mode_input_list[0],key=lambda x:int(x))
-    #     else:
-    #         consid_mode_input_list[0].remove(label)
-
-    # def add_element_dshift(label):
-    #     checkbox_states_dshift[label] = not checkbox_states_dshift[label]
-    #     label2 = dict_dshift[label]
-    #     if checkbox_states_dshift[label]:
-    #         lastname_list[0].append(label2)
-    #         lastname_list[0] = sorted(lastname_list[0],key=lambda x:float(x))
-    #     else:
-    #         lastname_list[0].remove(label2)
-
-    # def add_element_eta(label):
-    #     checkbox_states_eta[label] = not checkbox_states_eta[label]
-    #     if checkbox_states_eta[label]:
-    #         europed_runs.append(label)
-    #         europed_runs.sort()
-    #     else:
-    #         europed_runs.remove(label)
-    # def change_crit(label):
-    #     crit_list[0] = label
-    # def change_plot(label):
-    #     if label == 'filter wrong slope':
-    #         filter_wrong_slope_list[0] = not filter_wrong_slope_list[0]
-    #     elif label == 'H line':
-    #         plot_hline_list[0] = not plot_hline_list[0]
-    #     elif label == 'V line':
-    #         plot_vline_list[0] = not plot_vline_list[0]
-
-    # def run_on_click(label):
-    #     ax.clear()
-    #     run(consid_mode_input_list[0], lastname_list[0], filter_wrong_slope_list[0], plot_hline_list[0], plot_vline_list[0], x_parameter_list[0], crit_list[0], crit_value_list[0])
-    #     plt.draw() 
-
-    # def change_xaxis(label):
-    #     if label == r'$\alpha$':
-    #         x_parameter_list[0] = 'alpha_helena_max'
-    #     elif label == r'$T_e^{\mathrm{ped}}$':
-    #         x_parameter_list[0] = 'teped'  
-    #     elif label == r'$\Delta$':
-    #         x_parameter_list[0] = 'delta' 
-    #     elif label == r'$p_{tot}^{\mathrm{ped}}$':
-    #         x_parameter_list[0] = 'pped'
-
-
-
-    # # check1 = CheckButtons(ax_checkbox_mode, list_mode[:len(list_mode)//2], list(checkbox_states_mode.values())[:len(list_mode)//2])
-    # # check1_bis = CheckButtons(ax_checkbox_mode_bis, list_mode[len(list_mode)//2:], list(checkbox_states_mode.values())[len(list_mode)//2:])
-    # # check2 = CheckButtons(ax_checkbox_dshift, list_dshift_label, list(checkbox_states_dshift.values()))
-    # # check3 = CheckButtons(ax_checkbox_eta, list_eta, list(checkbox_states_eta.values()))
-    # # check4 = CheckButtons(ax_checkbox_filter, ['filter wrong slope', 'H line', 'V line'], [filter_wrong_slope, plot_hline, plot_vline])
-    # # check5 = Button(ax_checkbox_run, 'Run')
-    # # check6 = RadioButtons(ax_radiobutton_xaxis, [r'$\alpha$',r'$T_e^{\mathrm{ped}}$',r'$\Delta$',r'$p_{tot}^{\mathrm{ped}}$'])
-    # # check7 = RadioButtons(ax_radiobutton_crit, ['diamag','alfven'], active=0 if crit=='diamag' else 1)
-    # # text = TextBox(ax_critvalue, '', initial=str(crit_value))
-
-    # # check1.on_clicked(add_element_mode)
-    # # check1_bis.on_clicked(add_element_mode) 
-    # # check2.on_clicked(add_element_dshift) 
-    # # check3.on_clicked(add_element_eta)
-    # # check4.on_clicked(change_plot)
-    # # check5.on_clicked(run_on_click)
-    # # check6.on_clicked(change_xaxis)
-    # # check7.on_clicked(change_crit)
-    # # text.on_submit(update_crit_value)
-    
-
-    # for i,mode in enumerate(list_mode):
-    #     c = global_functions.dict_mode_color[int(mode)]
-    #     if i < len(list_mode)//2:
-    #         check1.labels[i].set_color(c)
-    #     else:
-    #         check1_bis.labels[i-len(list_mode)//2].set_color(c)
-       
+    # Fifth box: Radiobuttons for x-axis parameter
+    ax_x_parameter = plt.subplot(gs[4,1:])
+    radio_button1 = RadioButtons(ax_x_parameter, [r'$\alpha$',r'$T_e^{\mathrm{ped}}$',r'$\Delta$',r'$p_{tot}^{\mathrm{ped}}$'], orientation='horizontal')
+    def change_xaxis(label):
+        if label == r'$\alpha$':
+            x_parameter = 'alpha_helena_max'
+        elif label == r'$T_e^{\mathrm{ped}}$':
+            x_parameter = 'teped'  
+        elif label == r'$\Delta$':
+            x_parameter = 'delta' 
+        elif label == r'$p_{tot}^{\mathrm{ped}}$':
+            x_parameter = 'pped'
+    radio_button1.on_clicked(change_xaxis)
 
     
-    # ax = ax_plot
-    # linestyles = {
-    #     '-0.0100':(0,(1, 5)),
-    #     '-0.0050':(0,(1, 1)),
-    #     '0.0000':'solid',
-    #     '0.0050':(0, (5, 1)),
-    #     '0.0100':(0, (5, 5)),
-    #     '0.0200':(0, (10, 1)),
-    #     '0.0300':(0, (10, 5)),
-    # }
-    # markers = {
-    #     '0':'o',
-    #     '1':'s',
-    #     '2':'^'
-    # }
+    # Sixth box: Envelope
+    ax_checkbox_envelope = plt.subplot(gs[5,1:3])
+    checkbox_envelope = CheckButtons(ax_checkbox_envelope, ['Envelope'], [False])
+    def change_envelope(label):
+        checkbox_envelope_[0] = not checkbox_envelope_[0]
+    checkbox_envelope.on_clicked(change_envelope)
+
+    # Seventh box: crit_value
+    ax_textbox_crit_value = plt.subplot(gs[6,1:3])
+    textbox_crit_value = TextBox(ax_textbox_crit_value, '', initial='0.03')
+    def update_crit_value(val):
+        crit_value = float(val)
+    textbox_crit_value.on_submit(update_crit_value)
+
+    # Eigth box: crit
+    ax_radiobutton_crit = plt.subplot(gs[7:9,1:3])
+    radiobutton_crit = RadioButtons(ax_radiobutton_crit, ['alfven', 'diamag'], active=0)
+    def change_crit(label):
+        crit = label
+    radiobutton_crit.on_clicked(change_crit)
+    
+
+    # Ninth box: checkboxes for modes considered
+    list_mode = ['1','2','3','4','5','7','10','20','30','40','50']
+    checkbox_states_mode = {mode: mode in consid_mode for mode in list_mode}
+    ax_checkbox_mode = plt.subplot(gs[5:9,3])
+    checkboxes_mode = CheckButtons(ax_checkbox_mode, consid_mode.keys(), [False]*len(consid_mode.keys()))
+    def add_element_mode(label):
+        checkbox_states_mode[label] = not checkbox_states_mode[label]
+        consid_mode[label] = checkbox_states_mode[label]
+    checkboxes_mode.on_clicked(add_element_mode)
+
+    # Tenth box: Run button
+    ax_run_button = plt.subplot(gs[9, 1:])
+    run_button = Button(ax_run_button, 'Run')
+    def run_on_click(event):
+        run(consid_mode, euroname_1[0], euroname_2[0], euroname_3[0], euroname_4[0], checkbox_envelope_[0], crit_value, filter_wrong_slope, crit, plot_hline, plot_vline, x_parameter)
+    run_button.on_clicked(run_on_click)
+
+    plt.show()
 
 
 
