@@ -35,8 +35,60 @@ time_inputs = [45.51]
 europed_names = [f'kbm_v2_0096_FIPM{fipm}_Q0{q0}' for fipm in [0,2] for q0 in [0,1]]
 europed_names = ['kbm_0096_fipm1.83','kbm_0096_fipm1.83_q01']
 
-europed_names = ['kbm_v2_0096_FIPM2_Q00','kbm_v2_0096_FIPM2_Q01','kbm_v2_0096_FIPM2_Q01.2']
+europed_names = ['frog10_vj_t2','kbm_v3_fipm2_alphat24','kbm_v3_fipm2_alphat24','kbm_v3_fipm2_alphat23','kbm_v3_fipm1_alphat22','kbm_v3_fipm1_alphat24','kbm_v3_fipm1_alphat23','kbm_v3_fipm1_alphat23_q01','kbm_v3_fipm2_alphat22_q01','kbm_v3_fipm1_alphat22_q01','kbm_v3_fipm1_alphat24_q01','kbm_v3_fipm2_alphat24_q01','kbm_v3_fipm2_alphat23_q01']
 
+
+# europed_names = ['m2_neped2.57_density_shift0.0200',
+#  'm2_neped2.57_density_shift0.0200_fi',
+#  'm2_neped2.57_density_shift0.0000_fi',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor_smoothsoft',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor_smoothsoft_at1',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor_smoothsoft_at1_ind',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor_smoothsoft_at1_ind_bk',
+#  'm2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor_smoothsoft_at1_ind_bk_cc']
+
+# europed_names = ['m2_neped2.57_density_shift0.0000_fi_bp0_an7_nesep_rgeom_minor_smoothsoft_mishka']
+
+# europed_names=['jet84794_lfrassinT052_standard_eped','jet84794_lfrassinT052_standard_eped_q0']
+# europed_names=['kbm_v4','kbm_v4_ind', 'kbm_v4_ind_q0']
+# europed_names=['m2_ds0.02','m2_ds0.02_ind', 'm2_ds0.02_ind_q0', 'm2_ds0.02_ind_fi','m2_ds0.02_ind_fi_kbm']
+
+
+# europed_names=['m2_ds0.02_ind_fi_kbm','m2_ds0.02_fi1_kbm','m2_ds0.02_fi1.3_kbm','m2_ds0.02_fi1.6_kbm','m2_ds0.02_fi1.9_kbm','m2_ds0.02_fi2.3_kbm','m2_ds0.02_fi3_kbm']
+# # europed_names=['m4_q0']
+# europed_names=['frog_20','frog_21','frog_22','frog_23']
+europed_names=['jet84794_lfrassinT052_standard_eped','jet84794_lfrassinT052_standard_eped_kbm0096']
+
+europed_names = [ 
+'jet84794_lfrassinT052_standard_eped_kbm0096',
+'jet84794_lfrassinT052_standard_eped_nesep_kbm_an2',
+'jet84794_lfrassinT052_standard_eped_q01.05_kbm',
+'jet84794_lfrassinT052_standard_eped_q0_kbm',
+'jet84794_lfrassinT052_standard_eped_kbm0096_fixedfi',
+'jet84794_lfrassinT052_standard_eped_nesep_kbm'
+]
+
+europed_names = [ 
+'jet84794_lfrassinT052_standard_eped',
+'jet84794_lfrassinT052_standard_eped_nesep_kbm',
+'starting_point'
+]
+
+europed_names = ['kbm_0.092','kbm_0.093','kbm_0.094','kbm_0.095','kbm_0096','kbm_0.097','kbm_0.098','kbm_0.099','kbm_0.1']
+europed_names = ['kbm_v2_0096','kbm_v2_0106']
+# europed_names = ['sp_v1b','sp_v2b']
+europed_names = ['sp_v2b','sp_v3b','sp_v4a','sp_v4b','sp_v4c','sp_v4d']
+europed_names = ['sp_v6a','sp_v6b','sp_v6c']
+
+# europed_names = ['frog_30']+[f'frog_30_va_t{i}' for i in range(1,81)]
+
+
+europed_names = ['sp_v8a','sp_v8b','sp_v8c','sp_v8d','sp_v8e']
 
 #####################################################################
 def main():
@@ -44,6 +96,7 @@ def main():
     for europed_name in europed_names:
         print('')
         print(shot)
+
 
         ppfuid(uid)
         fig, axs = plt.subplots(1,2,figsize=(12,5))
@@ -69,12 +122,28 @@ def main():
         psi = np.array(psi) + 1 - psi_sep
         psi_fit = np.array(psi_fit) + 1 - psi_sep
 
+
+        # psi_fit = np.r
+
         params = find_pedestal_values.fit_mtanh_pressure(psi_fit, temperature_fit)
         print('Te parameters exp')
         print(params)
+        te_2 = []
+        ppos, delta, h, s, offset  = params
+        for p in psi:
+            te_2.append(find_pedestal_values.mtanh_offset(p,ppos, delta, h, s, offset))
+        ax1.plot(psi,te_2,color='y')
+
+
+
         params = find_pedestal_values.fit_mtanh_pressure(psi_fit, density_fit)
         print('ne parameters exp')
         print(params)
+        ne_2 = []
+        ppos, delta, h, s, offset  = params
+        for p in psi:
+            ne_2.append(find_pedestal_values.mtanh_offset(p,ppos, delta, h, s, offset))
+        ax2.plot(psi,ne_2,color='y')
 
         ax1.scatter(psi,temperature,color='white',edgecolors='red')
         ax1.plot(psi_fit,temperature_fit,'red')
@@ -83,7 +152,7 @@ def main():
         ax2.plot(psi_fit,density_fit,'red')
 
 
-        psis = np.linspace(0.2,1.2,100)
+        psis = np.linspace(0,1.2,100)
         # te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,profile=1)
         te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,crit='diamag')
 
@@ -91,14 +160,14 @@ def main():
         ax1.plot(psis,te,color='orange',linewidth=3)
         ax2.plot(psis,ne,color='orange',linewidth=3)
 
-        ax1.text(0.05,0.05,europed_name,ha='left',va='bottom', transform=ax1.transAxes)
+        ax1.text(0.05,0.05,europed_name,ha='left',va='bottom', transform=ax1.transAxes, fontsize=6)
 
-        params = find_pedestal_values.fit_mtanh_pressure(psis, te)
-        print('Te parameters model')
-        print(params)
-        params = find_pedestal_values.fit_mtanh_pressure(psis, ne)
-        print('ne parameters model')
-        print(params)
+        # params = find_pedestal_values.fit_mtanh_pressure(psis, te)
+        # print('Te parameters model')
+        # print(params)
+        # params = find_pedestal_values.fit_mtanh_pressure(psis, ne)
+        # print('ne parameters model')
+        # print(params)
 
 
         plt.show()
