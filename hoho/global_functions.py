@@ -66,6 +66,7 @@ dict_mode_color = {
     5: 'm',   # magenta
     7: 'y',   # yellow
     10: 'k',  # black
+    15: 'orange',
     20: '#FFA07A',  # light salmon
     30: '#8A2BE2',  # blue violet
     40: '#32CD32',  # lime green

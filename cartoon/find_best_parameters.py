@@ -39,31 +39,39 @@ time_inputs = [45.51]
 
 
 initial_kbm_const = 0.096
-initial_fipm=0
+initial_fipm=0.75
+initial_alpha_t2=1.4
 initial_fipe=3
-initial_fipw=0.5
+initial_fipw=0.6
 
-max_kbm_const = 0.012
-min_kbm_const = 0.007
+max_kbm_const = 0.1
+min_kbm_const = 0.092
 max_step_kbm_const = 0.001
 
-max_fipm = 3
+max_fipm = 4
 min_fipm = 0
-max_step_fipm = 0.5
+max_step_fipm = 0
+
+max_alpha_t2 = 2.5
+min_alpha_t2 = 1.1
+max_step_alpha_t2 = 0.1
 
 max_fipe = 4.5
 min_fipe = 1.5
 max_step_fipe = 0.5
 
-max_fipw = 0.6
+max_fipw = 0.8
 min_fipw = 0.3
 max_step_fipw = 0.05
 
-maxs = np.array([max_kbm_const,max_fipm,max_fipe,max_fipw])
-mins = np.array([min_kbm_const,min_fipm,min_fipe,min_fipw])
-max_steps = np.array([max_step_kbm_const,max_step_fipm,max_step_fipe,max_step_fipw])
+# maxs = np.array([max_kbm_const,max_fipm,max_fipe,max_fipw])
+# mins = np.array([min_kbm_const,min_fipm,min_fipe,min_fipw])
+# max_steps = np.array([max_step_kbm_const,max_step_fipm,max_step_fipe,max_step_fipw])
+maxs = np.array([max_kbm_const,max_fipm,max_alpha_t2,max_fipe,max_fipw])
+mins = np.array([min_kbm_const,min_fipm,min_alpha_t2,min_fipe,min_fipw])
+max_steps = np.array([max_step_kbm_const,max_step_fipm,max_step_alpha_t2,max_step_fipe,max_step_fipw])
 
-initial_filename='frog00'
+initial_filename='frog_30'
 
 
 def is_batch_process_running(process_name):
@@ -75,7 +83,7 @@ def is_batch_process_running(process_name):
         return False
 
 def define_new_params(params):
-    random_numbers = np.array([random.uniform(-1, 1) for _ in range(4)])
+    random_numbers = np.array([random.uniform(-1, 1) for _ in range(len(params))])
     steps = max_steps*random_numbers
     temp_params = params + steps
     temp_params_b = [min(p,q) for (p,q) in zip(maxs,temp_params)]
@@ -86,9 +94,11 @@ def create_new_input_file(params, name):
     new_params = define_new_params(params)
     kbm_const = new_params[0]
     fipm = new_params[1]
-    fipe = new_params[2]
-    fipw = new_params[3]
-    command = f"/home/jwp9427/work/python/goodtools/setinput.py {initial_filename} run_name={name} width_const={kbm_const} fast_ion_pressure_multip={fipm} fast_ion_pressure_exponent={fipe} fast_ion_pressure_width={fipw}"
+    alpha_t2 = new_params[2]
+    fipe = new_params[3]
+    fipw = new_params[4]
+    # command = f"/home/jwp9427/work/python/goodtools/setinput.py {initial_filename} run_name={name} width_const={kbm_const} fast_ion_pressure_multip={fipm} fast_ion_pressure_exponent={fipe} fast_ion_pressure_width={fipw}"
+    command = f"/home/jwp9427/work/python/goodtools/setinput.py {initial_filename} run_name={name} width_const={kbm_const} fast_ion_pressure_multip={fipm} alpha_t2={alpha_t2} fast_ion_pressure_exponent={fipe} fast_ion_pressure_width={fipw}"
     result = subprocess.run(command, shell=True)
     return new_params
 
@@ -139,7 +149,7 @@ def get_reference_function():
 
     psi_fit = np.array(psi_fit) + 1 - psi_sep
 
-    psis = np.linspace(0.7,1.2,100)
+    psis = np.linspace(0.5,1.2,100)
 
     new_list = []
     interpolator = interp1d(psi_fit, temperature_fit, bounds_error=False)
@@ -149,15 +159,15 @@ def get_reference_function():
 
 
 def initial_te():
-    psis = np.linspace(0.7,1.2,100)
+    psis = np.linspace(0.5,1.2,100)
     # te,ne,dump2 = find_pedestal_values.create_profiles(initial_filename,psis,crit='diamag')
 
     try:
         te,ne,dump2 = find_pedestal_values.create_profiles(initial_filename,psis,crit='diamag')
-
+        return te
     except find_pedestal_values.CustomError:
         print("ouloulou")
-    return te
+    
 
 
 # def get_params(filename):
@@ -166,11 +176,12 @@ def initial_te():
 def main():
     best_kbm_const = initial_kbm_const
     best_fipm = initial_fipm
+    best_alpha_t2 = initial_alpha_t2
     best_fipe = initial_fipe
     best_fipw = initial_fipw
     best_filename = initial_filename
 
-    params = [best_kbm_const,best_fipm,best_fipe,best_fipw]
+    params = [best_kbm_const,best_fipm,best_alpha_t2,best_fipe,best_fipw]
     
     count_best_file = 1
     count_with_this_file = 1
@@ -186,7 +197,7 @@ def main():
         launch_and_wait(filenames)
 
         for i,filename in enumerate(filenames):
-            psis = np.linspace(0.7,1.2,100)
+            psis = np.linspace(0.5,1.2,100)
 
             try:
                 te,ne,dump2 = find_pedestal_values.create_profiles(filename,psis,crit='diamag')
@@ -197,8 +208,10 @@ def main():
             distance = distance_functions(to_compare_with, te)
 
             if distance < min_distance:
-
+                print('##########################')
                 print(f'New best file: {filename}')
+                print('##########################')
+
 
                 best_filename = filename
                 params = list_params[i]

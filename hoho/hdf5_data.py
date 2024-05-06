@@ -22,8 +22,6 @@ class CustomError(Exception):
 
 research_dir = os.environ['EUROPED_DIR']+'hdf5'
 
-
-
 def find_stored_name(europed_name):
     paths = glob.glob(f'{research_dir}/{europed_name}.h5*', recursive=False)
     print('{research_dir}/{europed_name}.h5*')
@@ -46,7 +44,6 @@ def find_stored_name(europed_name):
     if too_many_with_name:
         raise CustomError(f"Too many files finishing with '{europed_name}'")
 
-    print(stored_name)
     return stored_name
 
 def uncompress_cp_compress(europed_name):
@@ -55,38 +52,53 @@ def uncompress_cp_compress(europed_name):
     if stored_name.endswith('.h5.gz'):
         is_gz_compressed = True
         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-            with gzip.open(europed_run, 'rb') as gz_file:
+            with gzip.open(stored_name, 'rb') as gz_file:
                 tmp_file.write(gz_file.read())
                 tmp_file_name = tmp_file.name
-
-
-
-
-
-def read(europed_name, list_groups):
-    stored_name = find_stored_name(europed_name)
-
-    if stored_name.endswith('.h5.gz'):
-        with gzip.open(stored_name, 'rb') as f:
-            with io.BytesIO(f.read()) as buf:
-                # Open the HDF5 file from the wrapped object
-                with h5py.File(buf, 'r') as fil:
-                    print(fil)
-
+        temp_file = True
     else:
-        with h5py.File(europed_name, 'r') as hdf5_file:
-            print(hdf5_file)
+        temp_file = False
+        tmp_file_name = stored_name
+
+    return temp_file, tmp_file_name
+
+
+
+    if temp:
+        os.remove(tmp_file_name)
+
+    return res
+
+
+def read(tmp_file_name, list_groups):
+
+    with h5py.File(tmp_file_name, 'r') as hdf5_file:
+        temp = hdf5_file
+        for group in list_groups:
+            print(group, end='/')
+            temp = temp[group]
+        print()
+
+        print(temp)
+    
+        if isinstance(temp, h5py.Group):
+            print(f"Group Name: ")    
+            
+        if isinstance(temp, h5py.Dataset):
+            print(f"Dataset Name: {dataset_name}")
+        
             
 
 
 
 def get(europed_name, list_groups):
     
-    #is_compressed = uncompress_cp_compress(europed_name)
-    result = read(europed_name, list_groups)
-    delete_copy(europed_name, is_compressed)
+    temp_file, tmp_file_name = uncompress_cp_compress(europed_name)
+    result = read(tmp_file_name, list_groups)
+    if temp_file:
+        os.remove(tmp_file_name)
 
-    # return result
+    return result
 
     # europed_run = glob.glob(pattern)[0]
 
