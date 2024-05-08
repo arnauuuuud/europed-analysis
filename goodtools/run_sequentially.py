@@ -22,7 +22,7 @@ fontsizetick = constants.fontsizetick
 fontsizetext = constants.fontsizetext
 
 #####################################################################
-root_file_name='sa'
+root_file_name='sb'
 initial_rs=0.022
 initial_neped=2.57
 
@@ -58,7 +58,7 @@ def launch_and_wait(filename):
     return True
 
 def main():
-    input_file_names = create_list_of_input_file(root_file_name, list_eta=[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
+    input_file_names = create_list_of_input_file(root_file_name, list_eta=[0.2,0.4,0.6,0.8,0.9])
     for input_file_name in input_file_names:
         launch_and_wait(input_file_name) 
 
