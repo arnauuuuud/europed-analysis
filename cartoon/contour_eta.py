@@ -4,11 +4,8 @@
 from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 import numpy as np
 import matplotlib.tri as tri
-from scipy.spatial import Delaunay
 from scipy import interpolate
 import os
 from pylib.misc import ReadFile
@@ -35,8 +32,6 @@ dict_runid = {
 
 position_psin = 0.85
 
-def parse_modes(mode_str):
-    return mode_str.split(',')
 
 
 def argument_parser():

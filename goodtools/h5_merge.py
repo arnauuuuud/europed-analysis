@@ -7,7 +7,7 @@ import numpy as np
 import os, h5py, shutil
 
 
-class CustomError(Exception):
+class useful_recurring_functions.CustomError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
@@ -47,7 +47,7 @@ def copy_original_file(original_name, extension_name, option):
     os.chdir(foldername)
     new_name = new_name_for_original_file(original_name, extension_name, option)
     if os.path.exists(foldername+new_name):
-        raise CustomError('the new name for the original file already exists')
+        raise useful_recurring_functions.useful_recurring_functions.CustomError('the new name for the original file already exists')
     h5_manipulation.decompress_gz(original_name)
     shutil.copy(original_name +'.h5', new_name +'.h5')
     h5_manipulation.compress_to_gz(new_name)

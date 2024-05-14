@@ -4,11 +4,7 @@
 from hoho import useful_recurring_functions, startup
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 from pylib.misc import ReadFile
-import numpy as np
-import matplotlib.tri as tri
 import os
 
 def parse_modes(mode_str):

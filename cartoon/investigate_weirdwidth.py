@@ -6,9 +6,6 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
-def parse_modes(mode_str):
-    return mode_str.split(',')
-
 def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Plots the profile of the critical alpha versus density shift")

@@ -5,10 +5,6 @@ from hoho import useful_recurring_functions, europed_analysis, global_functions,
 import argparse
 import matplotlib.pyplot as plt
 from hoho import useful_recurring_functions, europed_hampus as europed
-import numpy as np
-
-def parse_modes(mode_str):
-    return mode_str.split(',')
 
 def argument_parser():
     """Plot a characteristic for one given density shift at different neped"""

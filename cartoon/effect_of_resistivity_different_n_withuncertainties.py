@@ -6,14 +6,6 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
-class CustomError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
-def parse_modes(mode_str):
-    return mode_str.split(',')
-
 def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Plots the profile of the critical alpha versus density shift")
@@ -136,7 +128,7 @@ def main(prefixes, firstname, middlname, crit, crit_value, labels, legendtitle, 
                             proportionality -= 0.01
 
                     if y_crit is  None:
-                        raise CustomError(f"No critical value found")
+                        raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical value found")
 
                     
                     list_eta.append(float(prefix))
@@ -151,7 +143,7 @@ def main(prefixes, firstname, middlname, crit, crit_value, labels, legendtitle, 
 
                     print("WENT GOOD : " + europed_run)
 
-                except CustomError:
+                except useful_recurring_functions.CustomError:
                     print(f"{europed_run:>40} NO CRITICAL VALUE FOUND")
                 except FileNotFoundError:
                     print(f"{europed_run:>40} FILE NOT FOUND")

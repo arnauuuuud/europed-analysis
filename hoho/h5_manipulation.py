@@ -1,10 +1,5 @@
 import os, gzip, re, shutil
 
-class CustomError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
 def get_latest_version(original_name):
     pattern = re.compile(rf'{original_name}_(\d+)_.*\.h5\.gz')
     with os.scandir() as entries:
@@ -36,4 +31,4 @@ def find_profile_with_delta(file, delta):
     for profile in file['scan'].keys():
         if abs(round((file['scan'][profile]['delta'][0]),5) - delta) < 0.0001:
             return profile
-    raise CustomError(f'No profile in {file} with the given delta {delta} - discrepancy between the delta list from the hdf5, and the different delta of each profile')
+    raise useful_recurring_functions.useful_recurring_functions.CustomError(f'No profile in {file} with the given delta {delta} - discrepancy between the delta list from the hdf5, and the different delta of each profile')

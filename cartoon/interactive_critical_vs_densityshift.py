@@ -7,15 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import Slider, CheckButtons, RadioButtons, Button
 import matplotlib.gridspec as gridspec
-from functools import partial
-
-class CustomError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
-def parse_modes(mode_str):
-    return mode_str.split(',')
 
 def argument_parser():
     """Defining comandline parser and returning the arguments"""
@@ -223,7 +214,7 @@ def main(prefixes, variations, firstnames, middlname, crit, crit_value, labels, 
 
                         has_unstable, y_crit, i_mode = europed_analysis.find_critical(x_param, tab, crit_value, filter_wrong_slope)
                         if y_crit is  None:
-                            raise CustomError(f"No critical value found")
+                            raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical value found")
 
                         list_ycrit.append(y_crit)
 
@@ -241,7 +232,7 @@ def main(prefixes, variations, firstnames, middlname, crit, crit_value, labels, 
                         list_dshifts.append(dshift)
 
 
-                    except CustomError:
+                    except useful_recurring_functions.CustomError:
                         pass
                     except FileNotFoundError:
                         pass

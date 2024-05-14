@@ -12,3 +12,8 @@ def parse_delta(str):
         step_size = 0.002
         deltas = np.arange(delta_min, delta_max + step_size, step_size)
         return deltas
+
+class CustomError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

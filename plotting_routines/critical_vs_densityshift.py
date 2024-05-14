@@ -6,7 +6,7 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
-class CustomError(Exception):
+class useful_recurring_functions.CustomError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
@@ -124,7 +124,7 @@ def main(prefixes, variations, firstname, middlname, crit, crit_value, labels, l
 
                     has_unstable, y_crit, i_mode = europed_analysis.find_critical(x_param, tab, crit_value)
                     if y_crit is  None:
-                        raise CustomError(f"No critical value found")
+                        raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical value found")
 
                     list_ycrit.append(y_crit)
 
@@ -146,7 +146,7 @@ def main(prefixes, variations, firstname, middlname, crit, crit_value, labels, l
 
                     print("WENT GOOD : " + europed_run)
 
-                except CustomError:
+                except useful_recurring_functions.CustomError:
                     print(f"{europed_run:>40} NO CRITICAL VALUE FOUND")
                 except FileNotFoundError:
                     print(f"{europed_run:>40} FILE NOT FOUND")

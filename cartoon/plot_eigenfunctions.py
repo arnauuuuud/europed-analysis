@@ -4,13 +4,8 @@
 from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, get_eigenfunction
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 import numpy as np
-from hoho import useful_recurring_functions, find_pedestal_values
-import matplotlib.tri as tri
-from scipy.spatial import Delaunay
-from pylib import castor
+
 
 def argument_parser():
     """Defining comandline parser and returning the arguments"""

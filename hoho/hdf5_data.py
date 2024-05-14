@@ -2,22 +2,11 @@
 # /usr/local/depot/Python-3.5.1/bin/python
 
 from hoho import useful_recurring_functions, startup, information_hdf5
-import argparse
 import os
-import re
-import math
-from hoho import useful_recurring_functions, europed_hampus as europed
 import h5py
 import gzip
 import tempfile
 import glob
-import io
-
-
-class CustomError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
 
 
 research_dir = os.environ['EUROPED_DIR']+'hdf5'
@@ -28,7 +17,7 @@ def find_stored_name(europed_name):
     too_many_with_name = False
     print(paths)
     if len(paths) == 0:
-        raise CustomError(f"No file found '{europed_name}'")
+        raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No file found '{europed_name}'")
     elif len(paths) == 1:
         stored_name = paths[0]
     elif len(paths) == 2:
@@ -42,7 +31,7 @@ def find_stored_name(europed_name):
         too_many_with_name = True
 
     if too_many_with_name:
-        raise CustomError(f"Too many files finishing with '{europed_name}'")
+        raise useful_recurring_functions.useful_recurring_functions.CustomError(f"Too many files finishing with '{europed_name}'")
 
     return stored_name
 

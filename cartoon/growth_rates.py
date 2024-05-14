@@ -11,12 +11,9 @@ from PyQt5.QtWidgets import (
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT as NavigationToolbar
 from hoho import useful_recurring_functions, europed_analysis, global_functions, startup
-import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 import math
-import re
-import matplotlib.gridspec as gridspec
 import numpy as np
 
 markers = ['.', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd']

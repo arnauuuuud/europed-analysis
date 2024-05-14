@@ -4,14 +4,8 @@
 from hoho import europed_analysis, global_functions, startup, useful_recurring_functions
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 import numpy as np
 import matplotlib.tri as tri
-from scipy.spatial import Delaunay
-
-
-
 
 def argument_parser():
     """Defining comandline parser and returning the arguments"""

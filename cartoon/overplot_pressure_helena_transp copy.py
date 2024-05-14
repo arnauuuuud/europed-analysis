@@ -4,21 +4,13 @@
 from hoho import useful_recurring_functions, startup
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 from pylib.misc import ReadFile
 import numpy as np
-import matplotlib.tri as tri
 from scipy import interpolate
 import os
 from netCDF4 import Dataset # Import netCDF library
 
 TRANSPDat = Dataset("/common/transp_shared/Data/result/JET/84794/D05/D05.CDF") # Define the netCDF file path
-
-def parse_modes(mode_str):
-    return mode_str.split(',')
-
-
 
 def argument_parser():
     """Defining comandline parser and returning the arguments"""
@@ -29,8 +21,6 @@ def argument_parser():
 
     args = parser.parse_args()
     return args.europed_name, args.id
-
-
 
 def extract_psi_and_j(filename):
     foldername = f"{os.environ['HELENA_DIR']}output"

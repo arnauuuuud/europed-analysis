@@ -1,27 +1,12 @@
 import os
-import subprocess
 from hoho import useful_recurring_functions, europed_hampus as europed
 import matplotlib.pyplot as plt
-from matplotlib import ticker
 import h5py
 import gzip
 import tempfile
 import numpy as np
-from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
 import glob
-import re
-import math
-from hoho import useful_recurring_functions, global_functions
-import scipy.interpolate
-from itertools import islice
 from scipy.optimize import curve_fit
-
-
-class CustomError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
 
 def mtanh_offset(r, ppos, delta, h, s, offset):
     x = 2*(ppos-r)/delta
@@ -39,10 +24,10 @@ def find_critical_pars(europed_name, crit):
         for line in f.readlines():
 
             if crit == 'alfven' and line.startswith("no critical profile found for gamma/gamma_A>0.030000 criterion"):
-                raise CustomError(f"No critical profile found for criterion {crit} in {europed_name}")
+                raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical profile found for criterion {crit} in {europed_name}")
 
             elif crit == 'diamag' and line.startswith("no critical profile found for gamma/omega*>0.250000 criterion"):
-                raise CustomError(f"No critical profile found for criterion {crit} in {europed_name}")
+                raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical profile found for criterion {crit} in {europed_name}")
 
             if  process_next_line:
                 line_nepars = line
@@ -226,7 +211,7 @@ def get_frac(europed_name, crit, profile=None):
     psis = np.linspace(0.85,1,10)
     try:
         te_profile, ne_profile, neped = create_profiles(europed_name, psis, crit, profile)
-    except  CustomError:
+    except  useful_recurring_functions.CustomError:
         print(f"NO CRITICAL PROFILE WAS FOUND FOR {europed_name} - IMPOSSIBLE TO TAKE nesep/neped FOR THE CRITICAL PROFILES")
         return None
     te_profile, ne_profile, neped = create_profiles(europed_name, psis, crit, profile)
@@ -238,7 +223,7 @@ def get_nesep(europed_name, crit, profile=None):
     psis = np.linspace(0.85,1,10)
     try:
         te_profile, ne_profile, neped = create_profiles(europed_name, psis, crit, profile)
-    except  CustomError:
+    except  useful_recurring_functions.CustomError:
         print(f"NO CRITICAL PROFILE WAS FOUND FOR {europed_name} - IMPOSSIBLE TO TAKE nesep FOR THE CRITICAL PROFILES")
         return None
     nesep = ne_profile[-1]

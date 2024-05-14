@@ -4,14 +4,7 @@
 from hoho import useful_recurring_functions, europed_analysis, global_functions, startup
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 import numpy as np
-
-
-def parse_modes(mode_str):
-    return mode_str.split(',')
-
 
 def argument_parser():
     """Defining comandline parser and returning the arguments"""

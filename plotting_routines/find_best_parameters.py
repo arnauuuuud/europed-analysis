@@ -156,7 +156,7 @@ def initial_te():
     try:
         te,ne,dump2 = find_pedestal_values.create_profiles(initial_filename,psis,profile=1)
 
-    except find_pedestal_values.CustomError:
+    except find_pedestal_values.useful_recurring_functions.CustomError:
         print("ouloulou")
     return te
 
@@ -192,7 +192,7 @@ def main():
             try:
                 te,ne,dump2 = find_pedestal_values.create_profiles(filename,psis,profile=1)
 
-            except find_pedestal_values.CustomError:
+            except find_pedestal_values.useful_recurring_functions.CustomError:
                 continue
 
             distance = distance_functions(to_compare_with, te)

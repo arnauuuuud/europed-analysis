@@ -2,21 +2,8 @@
 # /usr/local/depot/Python-3.5.1/bin/python
 
 from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values
-import argparse
 import matplotlib.pyplot as plt
-import matplotlib.transforms as transforms
-import math
 import numpy as np
-import matplotlib.tri as tri
-from scipy.spatial import Delaunay
-from scipy import interpolate
-import os
-from pylib.misc import ReadFile
-import glob
-import h5py
-import gzip
-import tempfile
-
 from netCDF4 import Dataset # Import netCDF library
 
 TRANSPDat = Dataset("/common/transp_shared/Data/result/JET/84794/D05/D05.CDF") # Define the netCDF file path
