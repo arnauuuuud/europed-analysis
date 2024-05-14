@@ -88,7 +88,8 @@ europed_names = ['sp_v6a','sp_v6b','sp_v6c']
 # europed_names = ['frog_30']+[f'frog_30_va_t{i}' for i in range(1,81)]
 
 
-europed_names = ['sp_v8a','sp_v8b','sp_v8c','sp_v8d','sp_v8e']
+europed_names = ['sp_v8a','sp_v8b','sp_v8c','sp_v8d','sp_v8e','sb_eta0.0_rs0.022_neped2.57']
+europed_names = ['sb_eta0.0_rs0.022_neped2.57']
 
 #####################################################################
 def main():
@@ -153,8 +154,8 @@ def main():
 
 
         psis = np.linspace(0,1.2,100)
-        # te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,profile=1)
-        te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,crit='diamag')
+        # te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,profile=3)
+        te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,crit='alfven')
 
 
         ax1.plot(psis,te,color='orange',linewidth=3)

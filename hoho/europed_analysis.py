@@ -26,6 +26,7 @@ def get_x_parameter(filename, x_parameter="alpha_helena_max"):
         filename = glob.glob(pattern)[0]
     except IndexError:
         print(f"File not found: {original_filename}")
+        return 'File not found'
 
     if filename.endswith(".gz"):
         # Create a temporary file to decompress the .h5.gz file

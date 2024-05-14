@@ -104,7 +104,7 @@ class EuropedHDF5:
 
     def get_input(self, key):
         with h5py.File(self.filepath, 'r') as hdf5_file:
-            value = hdf5_file['input'][key].value[0].decode("utf-8")
+            value = hdf5_file['input'][key].value[0]
         return value
 
     def get_gamma_of_all_modes(self, crit = 'alfven'):

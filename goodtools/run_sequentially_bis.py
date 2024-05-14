@@ -8,7 +8,6 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from scipy.interpolate import interp1d
 import subprocess
-import subprocess
 import psutil
 import re
 import random
@@ -16,7 +15,7 @@ import time
 
 
 #####################################################################
-root_file_name='sb'
+root_file_name='sb_wr'
 initial_rs=0.022
 initial_neped=2.57
 
@@ -29,7 +28,7 @@ def create_input_file(root_file_name, eta, relative_shift, neped):
 
 
 def create_list_of_input_file(root_file_name, list_eta, list_rs=[initial_rs], list_neped=[initial_neped]):
-    list_file_name = [create_input_file(root_file_name,eta,rs,neped) for eta in list_eta for rs in list_rs for neped in list_neped]
+    list_file_name = [create_input_file(root_file_name,eta,rs,neped) for neped in list_neped for rs in list_rs for eta in list_eta]
     return(list_file_name)
 
 
@@ -38,6 +37,18 @@ def count_processes_running():
     result = subprocess.run(command, shell=True, capture_output=True, text=True)   
     return len(result.stdout.splitlines())
 
+def already_exists(filename):
+    command = f"find /home/hnystrom/work/europed/output/ -name {filename}"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    len1 = len(result.stdout.splitlines())
+    command = f"find /home/jwp9427/work/europed/output/ -name {filename}"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    len2 = len(result.stdout.splitlines())
+    if len1 + len2 >= 1:
+        return True
+    else:
+        return False
+
 
 def launch_and_wait(filename):
     print(f'Launching run with filename: {filename}')
@@ -45,16 +56,17 @@ def launch_and_wait(filename):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
     time.sleep(90)
-    while count_processes_running()>15:
+    while count_processes_running()>20:
         print("Not enough computing time to launch new runs", end='\r')
-        time.sleep(300)  # Check every 10 minutes  
+        time.sleep(600)  # Check every 10 minutes  
     print("Available computing time")
     return True
 
 def main():
-    input_file_names = create_list_of_input_file(root_file_name, list_eta=[0.0,1.0], list_neped=[2.07,3.07])
+    input_file_names = create_list_of_input_file(root_file_name, list_eta=[1.0,0.5], list_neped=[2.57], list_rs=[-0.01,0.0,0.03])
     for input_file_name in input_file_names:
-        launch_and_wait(input_file_name) 
+        if not already_exists(input_file_name):
+            launch_and_wait(input_file_name) 
 
 if __name__ == "__main__":
     main()
