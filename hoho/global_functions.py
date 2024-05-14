@@ -8,6 +8,7 @@ from matplotlib.colors import to_hex
 ne_color = '#db7a58'
 te_color = '#6198d2'
 
+
 def get_plot_labels_gamma_profiles(x_parameter, crit):
     """translates the parameters to plot labels"""
     ylabels = {

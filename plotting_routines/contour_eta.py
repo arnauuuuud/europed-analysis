@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions, startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
@@ -43,7 +43,7 @@ def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Plots the values of the growth rate gamma and the critical contour on a 2D map neped,Teped (with the alven criterion)")
     parser.add_argument("prefix", help = "prefix of the Europed run")
-    parser.add_argument("variations", type=parse_modes, help = "name variations of the Europed runs")
+    parser.add_argument("variations", type=useful_recurring_functions.parse_modes, help = "name variations of the Europed runs")
     
     parser.add_argument("-s", "--suffix", help= "common suffix of the Europed runs if needed")
     
@@ -54,8 +54,8 @@ def argument_parser():
 
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-x',"--exclud_mode", type=parse_modes, help = "list of modes to exclude, comma-separated (will plot all modes except for these ones)")
-    group.add_argument('-m',"--consid_mode", type=parse_modes, help = "list of modes to consider, comma-separated (will plot only these modes)")
+    group.add_argument('-x',"--exclud_mode", type=useful_recurring_functions.parse_modes, help = "list of modes to exclude, comma-separated (will plot all modes except for these ones)")
+    group.add_argument('-m',"--consid_mode", type=useful_recurring_functions.parse_modes, help = "list of modes to consider, comma-separated (will plot only these modes)")
 
     args = parser.parse_args()
 

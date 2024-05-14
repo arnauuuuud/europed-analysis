@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import startup
+from hoho import useful_recurring_functions, startup
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
@@ -19,7 +19,7 @@ def parse_modes(mode_str):
 def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Plot the current profileof a HELENA file")
-    parser.add_argument("europed_name", type=parse_modes, help = "name of the europed name")
+    parser.add_argument("europed_name", type=useful_recurring_functions.parse_modes, help = "name of the europed name")
     parser.add_argument("id", help = "id of the profile")
 
 

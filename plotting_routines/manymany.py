@@ -3,7 +3,7 @@
 
 from thesis import constants
 import matplotlib.pyplot as plt
-from hoho import europed_analysis, global_functions, startup, get_eigenfunction
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, get_eigenfunction
 import matplotlib.transforms as transforms
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib.colors import Normalize

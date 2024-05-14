@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
-from hoho import constant_function,read_kk3_2022
+from hoho import useful_recurring_functions, constant_function,read_kk3_2022
 from thesis import constants
 
 major_linewidth = constants.major_linewidth

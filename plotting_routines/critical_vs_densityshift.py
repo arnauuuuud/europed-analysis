@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions,startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, find_pedestal_values
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,15 +17,15 @@ def parse_modes(mode_str):
 def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Plots the profile of the critical alpha versus density shift")
-    parser.add_argument("prefixes", type=parse_modes, help = "list of prefixes to construct the Europed run names")
-    parser.add_argument("variations", type=parse_modes, help = "name variations of the Europed runs (the Europed runs will have the name [prefix]+[variation]{+[suffix]})  If set to 'full_list', variations=['-0.0100','-0.0050','0.0000','0.050','0.0100','0.0050','0.0150','0.0200','0.0250','0.0350','0.0400']")
+    parser.add_argument("prefixes", type=useful_recurring_functions.parse_modes, help = "list of prefixes to construct the Europed run names")
+    parser.add_argument("variations", type=useful_recurring_functions.parse_modes, help = "name variations of the Europed runs (the Europed runs will have the name [prefix]+[variation]{+[suffix]})  If set to 'full_list', variations=['-0.0100','-0.0050','0.0000','0.050','0.0100','0.0050','0.0150','0.0200','0.0250','0.0350','0.0400']")
 
-    parser.add_argument("-A", "--firstname", type=parse_modes, help = "first part of the names, if you want to write before the prefixes")
+    parser.add_argument("-A", "--firstname", type=useful_recurring_functions.parse_modes, help = "first part of the names, if you want to write before the prefixes")
     parser.add_argument("-B", "--middlname", help = "between prefixes and variations")
 
     parser.add_argument("-d", "--diamag", action = 'store_const', const = 'diamag', dest = 'crit', default = 'alfven', help = "normalize growth rate to diamagnetic frequency instead of Alfven frequency")
     parser.add_argument("-v", "--critical_value", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
-    parser.add_argument("-l", "--labels", type=parse_modes, help= "labels to display for the different Europed run prefixes")
+    parser.add_argument("-l", "--labels", type=useful_recurring_functions.parse_modes, help= "labels to display for the different Europed run prefixes")
     parser.add_argument("-L", "--legendtitle", help= "legend title")
 
     parser.add_argument("-n", "--shown", action = 'store_const', const = True, dest = 'shown', default = False, help = "show critical n for each point")
@@ -43,8 +43,8 @@ def argument_parser():
 
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-x',"--exclude_mode", type=parse_modes, help = "list of modes to exclude, comma-separated (will consider all modes except for these ones)")
-    group.add_argument('-m',"--modes", type=parse_modes, help = "list of modes to consider, comma-separated (will consider only these modes)")
+    group.add_argument('-x',"--exclude_mode", type=useful_recurring_functions.parse_modes, help = "list of modes to exclude, comma-separated (will consider all modes except for these ones)")
+    group.add_argument('-m',"--modes", type=useful_recurring_functions.parse_modes, help = "list of modes to consider, comma-separated (will consider only these modes)")
 
     args = parser.parse_args()
 

@@ -1,237 +1,306 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions, startup
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QRadioButton, QVBoxLayout, QHBoxLayout,
+    QLabel, QCheckBox, QLineEdit, QPushButton, QButtonGroup
+)
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5 import NavigationToolbar2QT as NavigationToolbar
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 import math
+import re
+import matplotlib.gridspec as gridspec
 import numpy as np
 
-def parse_modes(mode_str):
-    return mode_str.split(',')
+markers = ['.', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd']
+colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'lime', 'teal', 'navy', 'sky blue', 'lavender', 'peach', 'maroon', 'turquoise', 'gold', 'silver', 'indigo', 'violet', 'burgundy', 'mustard', 'ruby', 'emerald', 'sapphire', 'amethyst']
 
 
-def argument_parser():
-    """Defining comandline parser and returning the arguments"""
-    parser = argparse.ArgumentParser(description = "Plots the growth rate of the individual toroidal modes versus alpha for the given europed run (the growth rate is normalized to the Alfven frequency) ")
-    parser.add_argument("europed_runs", type=parse_modes, help = "names of the Europed run to plot the modes of")
-    
-    parser.add_argument("-A", "--firsname", help = "first part of the names, if you want to write before the prefixes")
-    parser.add_argument("-B", "--middname", help = "between prefixes and variations")
-    parser.add_argument("-Z", "--lastname", type=parse_modes, help = "variations")
+
+def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode, hline, vline, legend):
+
+    # Clear the existing plot
+    plot_ax.clear()
+
+    euroname_1 = europed_names[0].split(',')
+    euroname_2 = europed_names[1].split(',')
+    euroname_3 = europed_names[2].split(',')
+    euroname_4 = europed_names[3].split(',')
+
+    euroname_2 = [''] if euroname_2 == [] else euroname_2
+    euroname_3 = [''] if euroname_3 == [] else euroname_3
+    euroname_4 = [''] if euroname_4 == [] else euroname_4
+    europed_names = [e1+e2+e3+e4 for e1 in euroname_1 for e2 in euroname_2 for e3 in euroname_3 for e4 in euroname_4]
+
+    print('')
+    print('')
+    print('############### Updated parameters ###############')
+    print(f'# List of runs:        {europed_names}')
+    print(f'# X-axis parameter:    {x_parameter}')
+    print(f'# Critical value:      {crit_value}')
+    print(f'# Stability criterion: {crit}')
+    print(f'# Plot envelope:       {envelope}')
+    print(f'# Modes:               {list_consid_mode}')
+    print(f'# Plot H-line:         {hline}')
+    print(f'# Plot V-line:         {vline}')
+    print('##################################################')
+    print('')
 
 
-    parser.add_argument("-d", "--diamag", action = 'store_const', const = 'diamag', dest = 'crit', default = 'alfven', help = "normalize growth rate to diamagnetic frequency instead of Alfven frequency")
-    parser.add_argument("-o", "--omega", action = 'store_const', const = 'omega', dest = 'crit', default = 'alfven', help = "plot omega")
+    for iplot,europed_run in enumerate(europed_names):
+        try:
+            res = europed_analysis.get_x_parameter(europed_run, x_parameter)
+            if type(res) == str and res == 'File not found':
+                continue
+            else:
+                x_param = res
+            gammas, modes = europed_analysis.get_gammas(europed_run, crit)
+            tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, list_consid_mode,[])
 
-    parser.add_argument("-v", "--critical_value", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
-
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument("-T", "--teped", action = 'store_const', const = 'teped', dest = 'xpar', default = 'alpha_helena_max', help = "plot versus pedestal temperature instead of alpha")
-    group.add_argument("-D", "--delta", action = 'store_const', const = 'delta', dest = 'xpar', help = "plot versus width instead of alpha")
-    group.add_argument("-P", "--pped", action = 'store_const', const = 'pped', dest = 'xpar', help = "plot versus pedestal pressure instead of alpha")
-    group.add_argument("-p", "--peped", action = 'store_const', const = 'peped', dest = 'xpar', help = "plot versus pedestal electron pressure instead of alpha")
-
-    parser.add_argument("-l", "--labels", type=parse_modes, help= "labels to display for the different Europed run prefixes")
-
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-x',"--exclud_mode", type=parse_modes, help = "list of modes to exclude, comma-separated (will plot all modes except for these ones)")
-    group.add_argument('-m',"--consid_mode", type=parse_modes, help = "list of modes to consider, comma-separated (will plot only these modes)")
-
-    parser.add_argument("-V", "--vertical_line", action = 'store_const', const = True, dest = 'plot_vline', default=False, help = "plot vertical line")
-    parser.add_argument("-H", "--horizontal_line", action = 'store_const', const = True, dest = 'plot_hline', default=False, help = "plot horizontal line")
-
-    parser.add_argument("-s", "--same_plot", action = 'store_const', const = True, dest = 'same_plot', default=False, help = "plot everything on the same plot")
+            sorted_indices = np.argsort(x_param)
+            x_param = x_param[sorted_indices]
+            tab = tab[sorted_indices]
+            
+            list_mode_to_plot = [mode for mode in list_consid_mode if mode in modes]
 
 
-    args = parser.parse_args()
-
-    if args.exclud_mode and args.consid_mode:
-        parser.error("Arguments --exclud_mode and --consid_mode are mutually exclusive. Use one or the other.")
-
-    if args.critical_value:
-        critical_value = float(args.critical_value)
-    else:
-        critical_value = None
-
-    return args.europed_runs, args.firsname, args.middname, args.lastname, args.crit, critical_value, args.labels, args.xpar, args.exclud_mode, args.consid_mode, args.plot_vline, args.plot_hline, args.same_plot
-
-
-def main(europed_runs, firsname, middname, lastname, crit, crit_value, labels, x_parameter, exclud_mode, consid_mode_input, plot_vline, plot_hline, same_plot):
-    
-    if firsname is None:
-        firsname = ''            
-    if middname is None:
-        middname = ''
-    if lastname is None:
-        lastname = ['']
-
-    if consid_mode_input:
-        consid_mode_input = sorted(consid_mode_input, key=lambda x: int(x))
-
-
-    # if labels is None and lastname != ['']:
-    #     labels = [europed_run + '/' + str(round(float(ln)*1,5)) + '%' for ln in lastname for europed_run in europed_runs]
-
-    if labels is None:
-        labels = europed_runs
-
-    europed_runs = [firsname + europed_run + middname + ln for ln in lastname for europed_run in europed_runs]
-
-    list_legends = {}
-
-
-    if crit_value is None:
-        if crit == "alfven":
-            crit_value=0.03
-        elif crit == "diamag":
-            crit_value=0.25
-
-    if not same_plot:
-        nplot= len(europed_runs) 
-
-        num_rows,num_cols = global_functions.subplots_dict[nplot]
-        fig,axs = plt.subplots(num_rows,num_cols, sharex=True, sharey=True, squeeze=True)
-        plt.subplots_adjust(wspace=0, hspace=0)
-
-        for iplot,europed_run in enumerate(europed_runs):
-            print(europed_run)
-            ax = global_functions.get_axis_subplot(nplot, axs, iplot)
-
-            if labels is not None:
-                ax.text(0.05, 0.95, rf"{labels[iplot]}", transform=ax.transAxes,verticalalignment='top', fontsize=10)
-            try:
-                x_param = europed_analysis.get_x_parameter(europed_run, x_parameter)
-                gammas, modes = europed_analysis.get_gammas(europed_run, crit)
-                tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode_input, exclud_mode)
-
-                sorted_indices = np.argsort(x_param)
-                x_param = x_param[sorted_indices]
-                tab = tab[sorted_indices]
-
-                def remove_wrong_slopes(tab):
-                    temp_tab = tab
-                    for j in range(len(temp_tab[0])):
-                        for i in range(len(temp_tab)-1):
-                            if temp_tab[i,j]>temp_tab[i+1,j]: 
-                                for poupou in range(i+1):
-                                    temp_tab[poupou,j] = None
-                    return temp_tab
-                
-                #tab = remove_wrong_slopes(tab)
-                consid_mode = sorted(consid_mode, key=lambda x: int(x))
-                for i, mode in enumerate(consid_mode):
-                    
-
+            if not envelope:
+                for i, mode in enumerate(list_mode_to_plot):
                     temp_x = x_param
                     temp_y = tab[:,i]
                     nan_indices = np.isnan(temp_y)
                     x_filtered = temp_x[~nan_indices]
                     y_filtered = temp_y[~nan_indices]
-                    list_legends[mode], = ax.plot(x_filtered,y_filtered,"o-",label=mode, color=global_functions.dict_mode_color[int(mode)])
-                    
-                if plot_vline:
-                    has_unstable, x_crit, col, n = europed_analysis.find_critical(x_param, tab, consid_mode, crit_value)
-                    print(n)
-                    if has_unstable and x_crit:
-                        ax.axvline(x_crit, color="r")
-
-                        xmin,xmax,ymin,ymax = ax.axis()
-                        ratio = (x_crit-xmin)/(xmax-xmin)
-
-                        trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
-                        x_crit_order = math.floor(math.log10(x_crit))
-                        x_crit_round = np.around(np.around(x_crit*10**-x_crit_order,1)*10**x_crit_order,6)
-
-                        ax.text(x_crit, 1.0, str(x_crit_round), color="r", horizontalalignment='center', verticalalignment='bottom',transform=trans)
-            except RuntimeError:
-                print(f"{europed_run:>40} RUNTIME ERROR : NO FIT FOUND")
-            if plot_hline:
-                ax.axhline(crit_value, linestyle="--",color="k")
-
+                    plot_ax.plot(x_filtered,y_filtered, color=global_functions.dict_mode_color[int(mode)], marker=markers[iplot], label=f'{europed_run} - {mode}')
             
-                
+            else:
+                x_envelope, y_envelope = europed_analysis.give_envelop(tab, x_param)
+                plot_ax.plot(x_envelope, y_envelope, color=colors[iplot], label=europed_run)
 
 
+            if vline:
+                has_unstable, x_crit, col, critn = europed_analysis.find_critical(x_param, tab, list_mode_to_plot, crit_value)
+                if has_unstable:
+                    if not envelope:
+                        colorvline = 'r'
+                    else:
+                        colorvline = colors[iplot] 
 
-        fig.legend(handles=list_legends.values(), title='n', fontsize=8)
-
-        #fig.legend(title="n", fontsize=8, loc='upper right')
-
-        x_label, y_label = global_functions.get_plot_labels_gamma_profiles(x_parameter, crit)
-
-        ax_temp = axs.flatten() if isinstance(axs, np.ndarray) else np.array([ax])
-        all_x_limits = np.array([axis.get_xlim() for axis in ax_temp])
-        all_y_limits = np.array([axis.get_ylim() for axis in ax_temp])
-        yaxis_top = np.max(all_y_limits)
-        xaxis_right = np.max(all_x_limits)
-
-        ax0 = global_functions.get_axis_subplot(nplot, axs, 0)
-        ax0.set_xlim(left=0,right=xaxis_right)
-        ax0.set_ylim(bottom=0,top=yaxis_top)
-
-        if num_rows == 1 and num_cols == 1:
-            axs.set_xlabel(x_label)
-            axs.set_ylabel(y_label)
-
-        elif num_rows == 1:
-            axs[0].set_ylabel(y_label)
-            for j in range(num_cols):
-                axs[j].set_xlabel(x_label)
-
-        else:
-            for j in range(0, num_cols):
-                axs[num_rows-1, j].set_xlabel(x_label)
-            for i in range(0, num_rows):
-                axs[i, 0].set_ylabel(y_label)
+                    plot_ax.axvline(x_crit, color=colorvline, linestyle=':')
+                    xmin,xmax,ymin,ymax = plot_ax.axis()
+                    ratio = (x_crit-xmin)/(xmax-xmin)
+                    trans = transforms.blended_transform_factory(plot_ax.transData, plot_ax.transAxes)
+                    x_crit_order = math.floor(math.log10(x_crit))
+                    x_crit_round = np.around(np.around(x_crit*10**-x_crit_order,1)*10**x_crit_order,6)
+                    plot_ax.text(x_crit, 1.0, str(x_crit_round), color=colorvline, horizontalalignment='center', verticalalignment='bottom',transform=trans)
 
 
+        except RuntimeError:
+            print(f"{europed_run:>40} RUNTIME ERROR : NO FIT FOUND")
+        except FileNotFoundError:
+            print(f"{europed_run:>40} FILE DOES NOT EXIST")
 
 
+        if hline:
+            plot_ax.axhline(crit_value, linestyle="--",color="k")
+
+    x_label, y_label = global_functions.get_plot_labels_gamma_profiles(x_parameter, crit)
+    plot_ax.set_xlabel(x_label)
+    plot_ax.set_ylabel(y_label)
+    if crit != 'omega':
+        plot_ax.set_ylim(bottom=0)
+    plot_ax.set_xlim(left=0)
+
+    if legend:
+        plot_ax.legend()
+
+    plot_canvas.draw()
+    plt.ion()
+
+def checkAll(self):
+    for checkbox in checkboxes_n:
+        checkbox.setChecked(True)
+
+def uncheckAll(self):
+    for checkbox in checkboxes_n:
+        checkbox.setChecked(False)
+
+
+def on_button_click():
+    # Get the selected radio button text
+    if radio_button_alpha.isChecked():
+        x_parameter = "alpha_helena_max"
+    elif radio_button_teped.isChecked():
+        x_parameter = "teped"
+    elif radio_button_delta.isChecked():
+        x_parameter = "delta"
+    elif radio_button_ptot.isChecked():
+        x_parameter = "pped"
     else:
-        fig, ax = plt.subplots()
+        print("No x parameter is selected, alpha is used")
+        x_parameter = "alpha_helena_max"
 
-        linestyles = ['solid','dashed','dotted','dashdot']
-        markers = ['o','^','s','*']
+    # Get the selected radio button text
+    if radio_button_diamag.isChecked():
+        crit = "diamag"
+        crit_value_edit.setText('0.25')
+    elif radio_button_alfven.isChecked():
+        crit_value_edit.setText('0.03')
+        crit = "alfven"    
+    elif radio_button_omega.isChecked():
+        crit = "omega"
 
-        for iplot,europed_run in enumerate(europed_runs):
-            try:
-                x_param = europed_analysis.get_x_parameter(europed_run, x_parameter)
-                gammas, modes = europed_analysis.get_gammas(europed_run, crit)
-                tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode_input, exclud_mode)
 
-                for i, mode in enumerate(consid_mode):
-                    ax.plot(x_param,tab[:,i],"o-", color=global_functions.dict_mode_color[int(mode)], linestyle = linestyles[iplot], marker = markers[iplot], label=labels[iplot] + ' - ' + str(mode))
-                
-                if plot_vline:
-                    has_unstable, x_crit, col = europed_analysis.find_critical(x_param, tab, crit_value)
-                    if has_unstable:
-                        ax.axvline(x_crit, color="r")
+    list_consid_mode = []
+    for checkbox in checkboxes_n:
+        if checkbox.isChecked():
+            list_consid_mode.append(int(checkbox.text()))
 
-                        xmin,xmax,ymin,ymax = ax.axis()
-                        ratio = (x_crit-xmin)/(xmax-xmin)
 
-                        trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
-                        x_crit_order = math.floor(math.log10(x_crit))
-                        x_crit_round = np.around(np.around(x_crit*10**-x_crit_order,1)*10**x_crit_order,6)
+    hline = checkbox_hline.isChecked()
+    vline = checkbox_vline.isChecked()
+    envelope = checkbox_envelope.isChecked()
+    legend = checkbox_legend.isChecked()
+    crit_value = float(crit_value_edit.text())
 
-                        ax.text(x_crit, 1.0, str(x_crit_round), color="r", horizontalalignment='center', verticalalignment='bottom',transform=trans)
-            except RuntimeError:
-                print(f"{europed_run:>40} RUNTIME ERROR : NO FIT FOUND")
-            if plot_hline:
-                ax.axhline(crit_value, linestyle="--",color="k")
+    text_values = []
+    for line_edit in line_edits:
+        text_values.append(line_edit.text())
 
-        ax.legend()
-        x_label, y_label = global_functions.get_plot_labels_gamma_profiles(x_parameter, crit)
-        ax.set_xlabel(x_label)
+    # Update the plot with new data
+    run(text_values, x_parameter, crit, crit_value, envelope, list_consid_mode, hline, vline, legend)
 
-        if crit != 'omega':
-            ax.set_ylim(bottom=0)
-        ax.set_xlim(left=0)
-    fig.tight_layout()
-    plt.show()
 
 if __name__ == '__main__':
-    europed_runs, firsname, middname, lastname, crit, crit_value, labels, x_parameter, exclud_mode, consid_mode, plot_vline, plot_hline, same_plot = argument_parser()
-    main(europed_runs, firsname, middname, lastname, crit, crit_value, labels, x_parameter, exclud_mode, consid_mode, plot_vline, plot_hline, same_plot)
+    app = QApplication(sys.argv)
+
+    # Create the main window
+    main_window = QWidget()
+    main_window.setWindowTitle('Growth rates')
+
+
+    # Create radio buttons for x-axis parameters
+    group_xaxis = QButtonGroup()
+    x_axis_label = QLabel("X-axis parameter")
+    radio_button_alpha = QRadioButton('alpha')
+    radio_button_teped = QRadioButton('teped')
+    radio_button_delta = QRadioButton('width')
+    radio_button_ptot = QRadioButton('pped')
+    group_xaxis.addButton(radio_button_alpha)
+    group_xaxis.addButton(radio_button_teped)
+    group_xaxis.addButton(radio_button_delta)
+    group_xaxis.addButton(radio_button_ptot)
+    radio_button_alpha.setChecked(True)
+
+    # Create radio buttons for criteria
+    group_crit = QButtonGroup()
+    criterion_label = QLabel("Criterion")
+    radio_button_diamag = QRadioButton("Diamagnetic")
+    radio_button_alfven = QRadioButton("Alfvén")
+    radio_button_omega = QRadioButton("Omega")
+    group_crit.addButton(radio_button_diamag)
+    group_crit.addButton(radio_button_alfven)
+    group_crit.addButton(radio_button_omega)
+    radio_button_diamag.setChecked(True)
+
+    # Create checkboxes for 'n' values
+    check_all_button = QPushButton("All")
+    none_button = QPushButton("None")
+    check_all_button.clicked.connect(checkAll)
+    none_button.clicked.connect(uncheckAll)
+    n_label = QLabel("n")
+    checkboxes_n = [QCheckBox(str(n_value)) for n_value in [1, 2, 3, 4, 5, 7, 10, 20, 30, 40, 50]]
+    for checkbox in checkboxes_n:
+        checkbox.setChecked(True)
+
+    # Create line edit widgets
+    line_edits = [QLineEdit() for _ in range(4)]
+
+    # Create widgets for the rest of the parameters
+    crit_value_edit = QLineEdit()
+    crit_value_edit.setText('0.25')
+    checkbox_hline = QCheckBox("H line")
+    checkbox_vline = QCheckBox("V line")
+    checkbox_envelope = QCheckBox("Envelope")
+    checkbox_legend = QCheckBox("Legend")
+    checkbox_legend.setChecked(True)
+
+    # Create a button
+    plot_button = QPushButton('Plot')
+    plot_button.clicked.connect(on_button_click)
+
+    # Create a Matplotlib plot
+    fig, plot_ax = plt.subplots()
+    plot_canvas = FigureCanvas(fig)
+    toolbar = NavigationToolbar(plot_canvas,plot_canvas)
+
+    # Layouts
+    xparam_layout = QVBoxLayout()
+    xparam_layout.addWidget(x_axis_label)
+    xparam_layout.addWidget(radio_button_alpha)
+    xparam_layout.addWidget(radio_button_delta)
+    xparam_layout.addWidget(radio_button_teped)
+    xparam_layout.addWidget(radio_button_ptot)
+
+    crit_layout = QVBoxLayout()
+    crit_layout.addWidget(criterion_label)
+    crit_layout.addWidget(radio_button_diamag)
+    crit_layout.addWidget(radio_button_alfven)
+    crit_layout.addWidget(radio_button_omega)
+    crit_layout.addWidget(crit_value_edit)
+
+    n_layout = QVBoxLayout()
+    n_layout.addWidget(n_label)
+    n_layout.addStretch()
+    n_layout.addWidget(check_all_button)
+    n_layout.addWidget(none_button)
+    for checkbox in checkboxes_n:
+        n_layout.addWidget(checkbox)
+
+    text_layout = QVBoxLayout()
+    for line_edit in line_edits:
+        text_layout.addWidget(line_edit)
+
+    rest_layout = QVBoxLayout()
+    rest_layout.addWidget(checkbox_hline)
+    rest_layout.addWidget(checkbox_vline)
+    rest_layout.addWidget(checkbox_envelope)
+    rest_layout.addWidget(checkbox_legend)
+
+    button_layout = QVBoxLayout()
+    button_layout.addWidget(plot_button)
+
+    column_layout = QVBoxLayout()
+    column_layout.addLayout(xparam_layout)
+    column_layout.addLayout(crit_layout)
+    column_layout.addLayout(rest_layout)
+
+    line_layout = QHBoxLayout()
+    line_layout.addLayout(column_layout)
+    line_layout.addLayout(n_layout)
+
+    right_layout = QVBoxLayout()
+    right_layout.addLayout(text_layout)
+    right_layout.addLayout(line_layout)
+    right_layout.addLayout(button_layout)
+
+    left_layout = QVBoxLayout()
+    left_layout.addWidget(toolbar)
+    left_layout.addWidget(plot_canvas)
+
+    main_layout = QHBoxLayout()
+    main_layout.addLayout(left_layout,2)
+    main_layout.addLayout(right_layout,1)
+
+    main_window.setLayout(main_layout)
+    main_window.show()
+    sys.exit(app.exec_())
+
+

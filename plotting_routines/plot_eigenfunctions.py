@@ -1,13 +1,13 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions, startup, get_eigenfunction
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, get_eigenfunction
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 import math
 import numpy as np
-from hoho import find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values
 import matplotlib.tri as tri
 from scipy.spatial import Delaunay
 from pylib import castor

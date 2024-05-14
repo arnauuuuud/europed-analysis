@@ -1,6 +1,6 @@
 import os
 import subprocess
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import h5py
@@ -12,7 +12,7 @@ from matplotlib.patches import Patch
 import glob
 import re
 import math
-from hoho import global_functions
+from hoho import useful_recurring_functions, global_functions
 import scipy.interpolate
 from itertools import islice
 from scipy.optimize import curve_fit

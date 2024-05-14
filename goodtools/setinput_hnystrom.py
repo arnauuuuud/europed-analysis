@@ -2,7 +2,7 @@
 import sys
 import sys
 sys.path.insert(0, '/home/jwp9427/work/python')
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import os
 import argparse
 

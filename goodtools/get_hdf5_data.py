@@ -1,12 +1,12 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import startup, information_hdf5
+from hoho import useful_recurring_functions, startup, information_hdf5
 import argparse
 import os
 import re
 import math
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import h5py
 import gzip
 import tempfile
@@ -19,7 +19,7 @@ def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Give structure of the hds")
     parser.add_argument("europed_name", help = "name of the old run")
-    parser.add_argument("list_groups", type=parse_modes, help = "list of group or datasets going down from the root of the file")
+    parser.add_argument("list_groups", type=useful_recurring_functions.parse_modes, help = "list of group or datasets going down from the root of the file")
 
     args = parser.parse_args()
     return args.europed_name, args.list_groups
@@ -43,8 +43,11 @@ def main(europed_name, list_groups):
         for group in list_groups:
             print(group, end='/')
             temp = temp[group]
-        print()
-        print(temp[0])
+        try:
+            print()
+            print(temp[0])
+        except AttributeError:
+            print(list(temp.keys()))
 
 
 

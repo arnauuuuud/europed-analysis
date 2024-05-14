@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions, startup
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
@@ -22,8 +22,8 @@ def argument_parser():
     
     parser.add_argument("-A", "--firsname", help = "first part of the names, if you want to write before the prefixes")
     parser.add_argument("-C", "--middname", help = "between prefixes and variations")
-    parser.add_argument("-B", "--europed_runs", type=parse_modes, help = "names of the Europed run to plot the modes of")
-    parser.add_argument("-Z", "--lastname", type=parse_modes, help = "variations")
+    parser.add_argument("-B", "--europed_runs", type=useful_recurring_functions.parse_modes, help = "names of the Europed run to plot the modes of")
+    parser.add_argument("-Z", "--lastname", type=useful_recurring_functions.parse_modes, help = "variations")
 
 
     parser.add_argument("-d", "--diamag", action = 'store_const', const = 'diamag', dest = 'crit', default = 'alfven', help = "normalize growth rate to diamagnetic frequency instead of Alfven frequency")
@@ -35,11 +35,11 @@ def argument_parser():
     group.add_argument("-P", "--pped", action = 'store_const', const = 'pped', dest = 'xpar', help = "plot versus pedestal pressure instead of alpha")
     group.add_argument("-p", "--peped", action = 'store_const', const = 'peped', dest = 'xpar', help = "plot versus pedestal electron pressure instead of alpha")
 
-    parser.add_argument("-l", "--labels", type=parse_modes, help= "labels to display for the different Europed run prefixes")
+    parser.add_argument("-l", "--labels", type=useful_recurring_functions.parse_modes, help= "labels to display for the different Europed run prefixes")
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-x',"--exclud_mode", type=parse_modes, help = "list of modes to exclude, comma-separated (will plot all modes except for these ones)")
-    group.add_argument('-m',"--consid_mode", type=parse_modes, help = "list of modes to consider, comma-separated (will plot only these modes)")
+    group.add_argument('-x',"--exclud_mode", type=useful_recurring_functions.parse_modes, help = "list of modes to exclude, comma-separated (will plot all modes except for these ones)")
+    group.add_argument('-m',"--consid_mode", type=useful_recurring_functions.parse_modes, help = "list of modes to consider, comma-separated (will plot only these modes)")
 
     parser.add_argument("-V", "--vertical_line", action = 'store_const', const = True, dest = 'plot_vline', default=False, help = "plot vertical line")
     parser.add_argument("-H", "--horizontal_line", action = 'store_const', const = True, dest = 'plot_hline', default=False, help = "plot horizontal line")

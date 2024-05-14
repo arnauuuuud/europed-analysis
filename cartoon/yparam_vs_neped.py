@@ -1,10 +1,10 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions,startup
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup
 import argparse
 import matplotlib.pyplot as plt
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import numpy as np
 
 def parse_modes(mode_str):
@@ -15,7 +15,7 @@ def argument_parser():
     parser = argparse.ArgumentParser(description = "Plot a characteristic for one given density shift at different neped")
 
     parser.add_argument("prefix", help = "Europed prefix")
-    parser.add_argument("nepeds", type=parse_modes, help = "List of neped")
+    parser.add_argument("nepeds", type=useful_recurring_functions.parse_modes, help = "List of neped")
     parser.add_argument("suffix", help = "Suffix of the name, including density shift")
 
     parser.add_argument("-d", "--diamag", action = 'store_const', const = 'diamag', dest = 'crit', default = 'alfven', help = "normalize growth rate to diamagnetic frequency instead of Alfven frequency")

@@ -1,4 +1,4 @@
-from hoho import startup
+from hoho import useful_recurring_functions, startup
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms

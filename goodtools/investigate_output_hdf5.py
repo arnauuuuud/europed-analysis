@@ -1,10 +1,10 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions,startup
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup
 import argparse
 import matplotlib.pyplot as plt
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import numpy as np
 
 def parse_modes(mode_str):

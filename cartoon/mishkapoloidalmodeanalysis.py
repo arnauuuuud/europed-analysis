@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, global_functions,startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, find_pedestal_values
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +15,7 @@ def argument_parser():
     
     parser.add_argument("-d", "--diamag", action = 'store_const', const = 'diamag', dest = 'crit', default = 'alfven', help = "normalize growth rate to diamagnetic frequency instead of Alfven frequency")
     parser.add_argument("-v", "--critical_value", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
-    parser.add_argument("-l", "--labels", type=parse_modes, help= "labels to display for the different Europed run prefixes")
+    parser.add_argument("-l", "--labels", type=useful_recurring_functions.parse_modes, help= "labels to display for the different Europed run prefixes")
     parser.add_argument("-L", "--legendtitle", help= "legend title")
 
     parser.add_argument("-n", "--shown", action = 'store_const', const = True, dest = 'shown', default = False, help = "show critical n for each point")
@@ -33,8 +33,8 @@ def argument_parser():
 
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-x',"--exclude_mode", type=parse_modes, help = "list of modes to exclude, comma-separated (will consider all modes except for these ones)")
-    group.add_argument('-m',"--modes", type=parse_modes, help = "list of modes to consider, comma-separated (will consider only these modes)")
+    group.add_argument('-x',"--exclude_mode", type=useful_recurring_functions.parse_modes, help = "list of modes to exclude, comma-separated (will consider all modes except for these ones)")
+    group.add_argument('-m',"--modes", type=useful_recurring_functions.parse_modes, help = "list of modes to consider, comma-separated (will consider only these modes)")
 
     args = parser.parse_args()
 

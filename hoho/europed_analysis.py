@@ -1,6 +1,6 @@
 import os
 import subprocess
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 from pylib.misc import ReadFile
@@ -13,7 +13,7 @@ from matplotlib.patches import Patch
 import glob
 import re
 import math
-from hoho import global_functions, find_pedestal_values
+from hoho import useful_recurring_functions, global_functions, find_pedestal_values
 import scipy.interpolate
 
 def get_x_parameter(filename, x_parameter="alpha_helena_max"):

@@ -1,12 +1,12 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import startup, information_hdf5
+from hoho import useful_recurring_functions, startup, information_hdf5
 import argparse
 import os
 import re
 import math
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import h5py
 import gzip
 import tempfile

@@ -1,6 +1,6 @@
 #!/usr/local/depot/Python-3.7/bin/python3
 import sys
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import os
 import argparse
 

@@ -1,7 +1,7 @@
 import os
 import re
 import math
-from hoho import europed_hampus as europed
+from hoho import useful_recurring_functions, europed_hampus as europed
 import h5py
 import gzip
 import tempfile
