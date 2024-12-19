@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions, startup
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -41,15 +41,16 @@ def argument_parser():
 
     return args.prefix, variations, args.suffix, args.crit, critical_value, args.ypar, args.exclud_mode, args.consid_mode
 
-def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode):
+def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode_input):
 
     if crit_value is None:
         if crit == "alfven":
             crit_value=0.03
         elif crit == "diamag":
             crit_value=0.25
+    print(crit)
 
-    fig, ax = plt.subplots(figsize=(12,9))
+    fig, ax = plt.subplots(figsize=(6,6))
 
     list_n = []
     z = []
@@ -66,8 +67,10 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
         print(europed_run)
 
         try:
+            print(crit)
+            print(crit_value)
             gammas, modes = europed_analysis.get_gammas(europed_run, crit)
-            tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode, exclud_mode)
+            tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode_input, exclud_mode)
             tab_ne,tab_Te = europed_analysis.get_nT(europed_run)
 
 
@@ -85,13 +88,13 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
                 try:
                     argmax = np.nanargmax(tab[profile])
                     gamma = tab[profile, argmax]
-                    ne = tab_ne[profile]
-                    Te = tab_Te[profile]
+                    neped,teped = find_pedestal_values_old.pedestal_values(europed_run,profile)
 
-                    list_n.append(global_n[argmax])
+
+                    list_n.append(consid_mode[argmax])
                     z.append(gamma)
-                    x.append(ne)
-                    y.append(Te)
+                    x.append(neped)
+                    y.append(teped)
                 except ValueError:
                     print("ca marche pas du tout")
         except FileNotFoundError:
@@ -129,7 +132,7 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
                 print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
 
         # Create a new Triangulation object with filtered triangles
-        filtered_triang = tri.Triangulation(x, y, triangles=np.array(triangles_to_keep))
+        filtered_triang = tri.Triangulation(x, y)#, triangles=np.array(triangles_to_keep))
 
     elif ypar == 'pe':
         triang = tri.Triangulation(x,pressure)
@@ -145,7 +148,7 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
                 print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
 
         # Create a new Triangulation object with filtered triangles
-        filtered_triang = tri.Triangulation(x, pressure, triangles=np.array(triangles_to_keep))
+        filtered_triang = tri.Triangulation(x, pressure)#, triangles=np.array(triangles_to_keep))
 
 
 
@@ -154,7 +157,7 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
         top = 2
     elif ypar == 'te':
         bottom = 0
-        top = 1
+        top = 1.5
 
 
     # ax.triplot(filtered_triang, linestyle='dotted',color='blue')
@@ -174,41 +177,46 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
     #plt.clabel(cs, use_clabeltext =True, fmt='%1.2f',fontsize=10)
 
     if ypar == 'te':
-        cs = ax.contour(X_smooth, Y_te_smooth, Y_pe_smooth, levels=[0.5,1,1.5, 2],colors='k', linewidths = 1)
+        cs = ax.contour(X_smooth, Y_te_smooth, Y_pe_smooth, levels=[2, 2.5, 3, 3.5, 4],colors='k', linewidths = 1)
         #cs = ax.tricontour(filtered_triang, pressure, levels=[0.5,1,1.5, 2, 2.5, 3, 3.5],colors='k', linewidths = 1)
         ylabel, gammalabel = global_functions.get_plot_labels_gamma_profiles('teped',crit)
         #ax.set_ylim(top=0.5)
     elif ypar == 'pe':
-        cs = ax.contour(X_smooth, Y_pe_smooth, Y_te_smooth, levels=[0.1,0.2,0.3,0.5,0.7,0.9],colors='k', linewidths = 1)
+        # cs = ax.contour(X_smooth, Y_pe_smooth, Y_te_smooth, levels=[0.1,0.2,0.3,0.5,0.7,0.9],colors='k', linewidths = 1)
         #cs = ax.tricontour(filtered_triang, y, levels=[0.1, 0.2, 0.3, 0.4 ,0.5],colors='k', linestye="dotted", linewidths = 1)
         ylabel, gammalabel = global_functions.get_plot_labels_gamma_profiles('peped',crit)
         
     
-    plt.clabel(cs, use_clabeltext =True, fmt='%1.1f',fontsize=8)
+    # plt.clabel(cs, use_clabeltext =True, fmt='%1.1f',fontsize=8)
         
 
     if ypar == 'te':
         for x_ind,y_ind,n_ind in zip(x,y,list_n):
-            if y_ind > bottom and y_ind < top:
-                ax.text(x_ind, y_ind, str(n_ind), fontsize=8, color='b')
+            # if y_ind > bottom and y_ind < top:
+            ax.text(x_ind, y_ind, str(n_ind), fontsize=10, color='lightgray', fontweight='bold')
     if ypar == 'pe':
         for x_ind,y_ind,n_ind in zip(x,pressure,list_n):
-            if y_ind > bottom and y_ind < top:
-                ax.text(x_ind, y_ind, str(n_ind), fontsize=8, color='b')
+            # if y_ind > bottom and y_ind < top:
+            if y_ind > 6.05:
+                y_ind -= 0.1
+            if x_ind > 4:
+                x_ind -= 0.12
+            ax.text(x_ind, y_ind, str(n_ind), fontsize=10, color='lightgray', fontweight='bold')
 
-    ax.set_ylim(bottom=bottom,top=top)
+    # ax.set_ylim(bottom=bottom,top=top)
 
 
-    nelabel, shit = global_functions.get_plot_labels_gamma_profiles('neped',crit)
+    # nelabel, shit = global_functions.get_plot_labels_gamma_profiles('neped',crit)
     
 
-    ax.set_xlabel(nelabel)
-    ax.set_ylabel(ylabel)
+    ax.set_xlabel(r'$n_e^{\mathrm{ped}}$ $_{[10^{19} \mathrm{m}^{-3}]}$',fontsize=20)
+    ax.set_ylabel(ylabel,fontsize=20)
+
 
     
 
-    fig.colorbar(contour, label=gammalabel)
-    fig.tight_layout()
+    # fig.colorbar(contour, label=gammalabel)
+    #fig.tight_layout()
     plt.show()
 
 if __name__ == '__main__':

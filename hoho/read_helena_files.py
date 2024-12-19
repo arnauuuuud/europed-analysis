@@ -1,4 +1,4 @@
-from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
@@ -82,7 +82,7 @@ def get_psin_sig(europed_name, delta):
 
 def get_sig_pos(europed_name, profile, delta, pos):
     #rs = get_adapted_rs_number(europed_name, rs)
-    te_pars, ne_pars = find_pedestal_values.find_profile_pars(europed_name, profile)
+    te_pars, ne_pars = find_pedestal_values_old.find_profile_pars(europed_name, profile)
     #pos_temp = float(te_pars[3])
     delta = float(te_pars[4])
 
@@ -110,6 +110,63 @@ def get_eta_pos(europed_name, profile, delta, pos):
     sig = get_sig_pos(europed_name,profile,delta,pos)
     eta = 1/sig
     return eta
+
+def extract_psi_and_j(filename):
+    foldername = f"{os.environ['HELENA_DIR']}output"
+    os.chdir(foldername)
+
+    psi_values = []
+    j_values = []
+
+    ready1 = False
+    ready2 = False
+
+    s = False
+
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+
+            if 'PSI' in line and '<J>' in line:
+                # print(line, end=' ')
+                ready1 = True
+                pass
+
+            if 'S' in line and 'AVERAGE JPHI' in line:
+                # print(line, end=' ')
+                ready1 = True
+                s = True
+                pass
+
+            if ready1 and '*****' in line:
+                # print(line, end=' ')
+                ready2 = True
+                ready1 = False
+                pass
+            
+            elif ready2 and '*****' in line:
+                # print(line, end=' ')
+                ready2 = False
+                break
+
+            elif ready2 and '*****' not in line and not s:
+                # print(line, end=' ')
+                elements = line.split()
+                psi = float(elements[1])
+                j = float(elements[3])
+                psi_values.append(psi)
+                j_values.append(j)
+
+            elif ready2 and '*****' not in line and s:
+                # print(line, end=' ')
+                elements = line.split()
+                if len(elements)>=2:
+                    psi = float(elements[0])**2
+                    j = float(elements[1])
+                    psi_values.append(psi)
+                    j_values.append(j)
+
+    return psi_values,j_values
 
 def get_adapted_rs_number(filename, profile):
     foldername = f"{os.environ['EUROPED_DIR']}hdf5"

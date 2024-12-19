@@ -1,28 +1,10 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from ppf import *
-import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.cm as cm
-from matplotlib.colors import Normalize
-from hoho import useful_recurring_functions, constant_function,read_kk3_2022
-from thesis import constants
-from hoho import useful_recurring_functions, find_pedestal_values
-from scipy.interpolate import interp1d
 import subprocess
-import subprocess
-import psutil
-import re
-import random
 import time
-major_linewidth = constants.major_linewidth
-fontsizelabel = constants.fontsizelabel
-fontsizetick = constants.fontsizetick
-fontsizetext = constants.fontsizetext
 
 #####################################################################
-root_file_name='sb_wr'
 initial_rs=0.022
 initial_neped=2.57
 
@@ -70,7 +52,8 @@ def already_exists(filename):
         return False
 
 def main():
-    input_file_names = create_list_of_input_file(root_file_name, list_eta=[1.0], list_neped=[2.57], list_rs=[-0.01,0.02,0.03])
+    root_file_name='sb_n234'
+    input_file_names = create_list_of_input_file(root_file_name, list_eta=[2.0])
     for input_file_name in input_file_names:
         if not already_exists(input_file_name):
             launch_and_wait(input_file_name) 

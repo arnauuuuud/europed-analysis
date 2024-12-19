@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, europed_hampus as europed
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, europed_hampus as europed, h5_manipulation
 import argparse
 import matplotlib.pyplot as plt
 
@@ -12,15 +12,22 @@ def argument_parser():
     parser.add_argument("yaxises", type=useful_recurring_functions.parse_modes, help = "list of keys of the yaxis")
 
     parser.add_argument("-p",'--profiles', type=useful_recurring_functions.parse_modes, help = "list of profiles to consider")
+    parser.add_argument("-d",'--deltas', type=useful_recurring_functions.parse_modes, help = "list of deltas to consider (only works if profile is not given)")
 
     args = parser.parse_args()
-    return args.europed_name, args.yaxises, args.profiles
+    return args.europed_name, args.yaxises, args.profiles,args.deltas
 
-def main(europed_name,yaxises,profiles_input):
 
+def main(europed_name,yaxises,profiles_input, deltas):
+
+    h5_manipulation.decompress_gz(europed_name)
+    if profiles_input is None and deltas is not None:
+        profiles_input = [h5_manipulation.find_profile_with_delta_name(europed_name, float(delta)) for delta in deltas]
+    h5_manipulation.removedoth5(europed_name)
 
     a = europed.EuropedHDF5(europed_name)
-    deltas = a.get_scan_data("delta")
+    deltas_label = a.get_scan_data("delta")
+
 
     n_ychar = len(yaxises)
     if n_ychar==1:
@@ -56,7 +63,7 @@ def main(europed_name,yaxises,profiles_input):
         for i, (psi, profile) in enumerate(zip(psis, profiles)):
 
             if (profiles_input is None) or str(i+1) in profiles_input:
-                ax.plot(psi, profile, color = cmap(i/nprofs),label=str(round(deltas[i],3)))
+                ax.plot(psi, profile, color = cmap(i/nprofs),label=str(round(deltas_label[i-1],3)))
 
         ax.set_xlabel(r"$\psi_N$")
         y_label = global_functions.get_profiles_label(yaxis)
@@ -70,6 +77,8 @@ def main(europed_name,yaxises,profiles_input):
     fig.tight_layout()
     plt.show()
 
+
+
 if __name__ == '__main__':
-    europed_name,yaxises, profiles = argument_parser()
-    main(europed_name,yaxises, profiles)
+    europed_name,yaxises, profiles, deltas = argument_parser()
+    main(europed_name,yaxises, profiles, deltas)

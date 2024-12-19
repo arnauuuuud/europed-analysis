@@ -8,7 +8,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from hoho import useful_recurring_functions, constant_function,read_kk3_2022
 from thesis import constants
-from hoho import useful_recurring_functions, find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values_old
 from scipy.interpolate import interp1d
 import subprocess
 import subprocess

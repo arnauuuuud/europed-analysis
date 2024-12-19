@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 import math
 import numpy as np
-from hoho import useful_recurring_functions, find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values_old
 import matplotlib.tri as tri
 from scipy.spatial import Delaunay
 
@@ -94,7 +94,7 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
                     # z_temp.append(gamma)
                     # y_temp.append(Te)
 
-                    # frac = find_pedestal_values.get_frac(europed_run, crit)
+                    # frac = find_pedestal_values_old.get_frac(europed_run, crit)
 
                     # if frac:
                     #     z.append(gamma)

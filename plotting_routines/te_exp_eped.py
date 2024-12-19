@@ -8,7 +8,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from hoho import useful_recurring_functions, constant_function,read_kk3_2022
 from thesis import constants
-from hoho import useful_recurring_functions, find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values_old
 from scipy.interpolate import interp1d
 major_linewidth = constants.major_linewidth
 fontsizelabel = constants.fontsizelabel
@@ -68,10 +68,10 @@ def main():
         psi = np.array(psi) + 1 - psi_sep
         psi_fit = np.array(psi_fit) + 1 - psi_sep
 
-        params = find_pedestal_values.fit_mtanh_pressure(psi_fit, temperature_fit)
+        params = find_pedestal_values_old.fit_mtanh_pressure(psi_fit, temperature_fit)
         print('Te parameters exp')
         print(params)
-        params = find_pedestal_values.fit_mtanh_pressure(psi_fit, density_fit)
+        params = find_pedestal_values_old.fit_mtanh_pressure(psi_fit, density_fit)
         print('ne parameters exp')
         print(params)
 
@@ -83,8 +83,8 @@ def main():
 
 
         psis = np.linspace(0.2,1.2,100)
-        # te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,profile=1)
-        te,ne,dump2 = find_pedestal_values.create_profiles(europed_name,psis,crit='diamag')
+        # te,ne,dump2 = find_pedestal_values_old.create_profiles(europed_name,psis,profile=1)
+        te,ne,dump2 = find_pedestal_values_old.create_profiles(europed_name,psis,crit='diamag')
 
 
         ax1.plot(psis,te,color='orange',linewidth=3)
@@ -92,10 +92,10 @@ def main():
 
         ax1.text(0.05,0.05,europed_name,ha='left',va='bottom', transform=ax1.transAxes)
 
-        params = find_pedestal_values.fit_mtanh_pressure(psis, te)
+        params = find_pedestal_values_old.fit_mtanh_pressure(psis, te)
         print('Te parameters model')
         print(params)
-        params = find_pedestal_values.fit_mtanh_pressure(psis, ne)
+        params = find_pedestal_values_old.fit_mtanh_pressure(psis, ne)
         print('ne parameters model')
         print(params)
 

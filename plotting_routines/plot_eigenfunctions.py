@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 import math
 import numpy as np
-from hoho import useful_recurring_functions, find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values_old
 import matplotlib.tri as tri
 from scipy.spatial import Delaunay
 from pylib import castor

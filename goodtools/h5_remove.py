@@ -9,13 +9,13 @@ def argument_parser():
     """Defining comandline parser and returning the arguments"""
     parser = argparse.ArgumentParser(description = "Supress profile from hdf5, will create a new file with the current version of the file and update the given file")
     parser.add_argument("original_name", help = "original name of the run")
-    parser.add_argument("deltas", type=useful_recurring_functions.parse_delta, help= "list of deltas to suppress")
     parser.add_argument("--modes", "-n", type=useful_recurring_functions.parse_modes, help= "modes to be removed in the corresponding profiles")
+    parser.add_argument('--fixed_width', '-f', action='store_const', const=True, dest='is_fixed_width', default=False)
+    parser.add_argument("--deltas", "-d", type=useful_recurring_functions.parse_delta, help= "list of deltas (comma-separated), or delta_min and delta_max (dash-separated - steps 0.002)")
 
     args = parser.parse_args()
 
-    return args.original_name, args.deltas, args.modes
-
+    return args.original_name, args.deltas, args.modes, args.is_fixed_width
 
 def copy_original_file(original_name):
     foldername = f"{os.environ['EUROPED_DIR']}hdf5"
@@ -28,15 +28,22 @@ def copy_original_file(original_name):
     h5_manipulation.compress_to_gz(new_name)
     print(f'Old version of {original_name} is now named {new_name}')
 
-
-def update(original_name, modes, deltas):
-
+def update(original_name, modes, deltas, is_fixed_width):
     # Open the copied file in read-write mode
     with h5py.File(original_name + '.h5', 'a') as original_file:
         if not modes:
             suppressed_profile = []
             for delta in deltas:
-                profile = h5_manipulation.find_profile_with_delta(original_file,delta)
+                delta = round(delta,5)
+                try:
+                    if not is_fixed_width:  
+                        profile = h5_manipulation.find_profile_with_delta_file(original_file,delta)
+                    else:
+                        profile = h5_manipulation.find_profile_with_betaped_file(original_file,delta)
+
+                except useful_recurring_functions.CustomError as e:
+                    print(e)
+                    continue
                 stability_code = 'castor'
                 del original_file['scan'][profile]
                 suppressed_profile.append(profile)
@@ -45,7 +52,15 @@ def update(original_name, modes, deltas):
 
         else:
             for delta in deltas:
-                profile = h5_manipulation.find_profile_with_delta(original_file,delta)
+                delta = round(delta,5)
+                try:
+                    if not is_fixed_width:  
+                        profile = h5_manipulation.find_profile_with_delta_file(original_file,delta)
+                    else:
+                        profile = h5_manipulation.find_profile_with_betaped_file(original_file,delta)
+                except useful_recurring_functions.CustomError as e:
+                    print(e)
+                    continue
                 stability_code = 'castor'
                 for mode in modes:
                     try:
@@ -57,7 +72,7 @@ def update(original_name, modes, deltas):
 
 
 if __name__ == '__main__':
-    original_name, deltas, modes = argument_parser()
+    original_name, deltas, modes, is_fixed_width = argument_parser()
     copy_original_file(original_name)
-    update(original_name, modes, deltas)
+    update(original_name, modes, deltas, is_fixed_width)
     h5_manipulation.compress_to_gz(original_name)

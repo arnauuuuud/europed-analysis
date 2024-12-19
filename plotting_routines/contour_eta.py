@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
@@ -124,7 +124,7 @@ def get_psin_sig(europed_name, profile):
 
 def get_sig_pos(europed_name, profile):
     #profile = get_adapted_profile_number(europed_name, profile)
-    te_pars, ne_pars = find_pedestal_values.find_profile_pars(europed_name, profile)
+    te_pars, ne_pars = find_pedestal_values_old.find_profile_pars(europed_name, profile)
     pos = float(te_pars[3])
     delta = float(te_pars[4])
 

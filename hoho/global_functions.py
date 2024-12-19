@@ -4,10 +4,38 @@ from matplotlib.colors import Normalize
 from matplotlib.cm import ScalarMappable
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
+import numpy as np
+import matplotlib.colors as mcolors
 
 ne_color = '#db7a58'
 te_color = '#6198d2'
 
+psiN_label = r'$\psi_N$'
+betap_label = r'$\beta_p$'
+betan_label = r'$\beta_N$'
+rs_label = r'${n_e^{\mathrm{pos}}-T_e^{\mathrm{pos}}}_{[\%\psi_N]}$'
+rs2_label = r'${n_e^{\mathrm{pos}}-T_e^{\mathrm{pos}}(fit)}_{[\%\psi_N]}$'
+neped_label = r'${n_e^{\mathrm{ped}}}_{[10^{19} {\mathrm{m}}^{-3}]}$'
+teped_label = r'${T_e^{\mathrm{ped}}}_{[\mathrm{keV}]}$'
+peped_label = r'${p_e^{\mathrm{ped}}}_{[\mathrm{kPa}]}$'
+ne_label = r'${n_e}_{[10^{19} {\mathrm{m}}^{-3}]}$'
+te_label = r'${T_e}_{[\mathrm{keV}]}$'
+pe_label = r'${p_e}_{[\mathrm{kPa}]}$'
+alpha_label = r'$\alpha_{\mathrm{max}}$'
+neped_wo_label = r'${n_e^{\mathrm{ped}}}$'
+teped_wo_label = r'${T_e^{\mathrm{ped}}}$'
+peped_wo_label = r'${p_e^{\mathrm{ped}}}$'
+eta_label = r'${\eta/\eta_{\mathrm{Sp}}}$'
+eta_ped_ohm_label = r'${\eta_{\mathrm{Sp}}^{\mathrm{ped}}}_{[10^{-7} \Omega \cdot \mathrm{m}]}$'
+eta_ped_label = r'${\eta_{\mathrm{Sp}}^{\mathrm{ped}}}$'# '\n' r'$_{[\Omega \cdot \mathrm{m}]}$'
+alfvengamma_label = r'$\gamma / \omega_A$'
+nesepneped_label = r'$n_e^{\mathrm{sep}} / n_e^{\mathrm{ped}}$'
+delta_label = r'${\Delta}_{[\psi_N]}$'
+delta_pe_label = r'${\Delta(p_e)}_{[\psi_N]}$'
+delta_te_label = r'${\Delta(T_e)}_{[\psi_N]}$'
+q_label = r'$q$'
+j_label = r'$j$'
+delta_ne_label = r'${\Delta(n_e)}_{[\psi_N]}$'
 
 def get_plot_labels_gamma_profiles(x_parameter, crit):
     """translates the parameters to plot labels"""
@@ -21,10 +49,26 @@ def get_plot_labels_gamma_profiles(x_parameter, crit):
         'teped' : r'${T_e^{\mathrm{ped}}}_{[\mathrm{keV}]}$',
         'alpha_helena_max' : r'$\alpha_{\mathrm{max}}$',
         'peped' : r'${p_e^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
+        'peped_product' : r'${p_e^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
+        'pped' : r'${p_{tot}^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
+        'neped' : r'${n_e^{\mathrm{ped}}}_{[10^{19} \mathrm{m}^{-3}]}$',
+        'nesep_neped' : r'$n_e^{\mathrm{sep}}/n_e^{\mathrm{ped}}$',
+        'betaped' : r'${\beta_p^{\mathrm{ped}}}$'
+    }
+    return xlabels[x_parameter], ylabels[crit]
+    
+    
+def get_ylabel(x_parameter):
+    """translates the parameters to plot labels"""
+    xlabels = {
+        'delta' : r'$w_{[\psi_N]}$',
+        'teped' : r'${T_e^{\mathrm{ped}}}_{[\mathrm{keV}]}$',
+        'alpha_helena_max' : r'$\alpha_{\mathrm{max}}$',
+        'peped' : r'${p_e^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
         'pped' : r'${p_{tot}^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
         'neped' : r'${n_e^{\mathrm{ped}}_{[10^{19} \mathrm{m}^{-3}]}$'
     }
-    return xlabels[x_parameter], ylabels[crit]
+    return xlabels[x_parameter]
 
 def get_critical_plot_label(y_param):
     ylabels = {
@@ -34,6 +78,7 @@ def get_critical_plot_label(y_param):
         'pped' : r'critical ${p_{tot}^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
         'neped' : r'critical ${n_e^{\mathrm{ped}}}_{[10^{19} \mathrm{m}^{-3}]}$',
         'peped' : r'critical ${p_e^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
+        'peped_product' : r'critical ${p_e^{\mathrm{ped}}}_{[\mathrm{kPa}]}$',
     }
     return ylabels[y_param]
 
@@ -59,6 +104,23 @@ def get_profiles_label(y_param):
     }
     return ylabels[y_param]
 
+def contour_labels(xparam, yparam):
+    xlabel = contour_label(xparam)
+    ylabel = contour_label(yparam)
+    return xlabel, ylabel
+
+def contour_label(param):
+    label = {
+        'teped' : teped_label,
+        'peped' : peped_label,
+        'neped' : neped_label,
+        'alpha' : alpha_label,
+        'betan' : betan_label,
+        'betap' : betap_label,
+        'frac' : nesepneped_label,
+    }
+    return label[param]
+
 dict_mode_color = {
     1: 'b',   # blue
     2: 'g',   # green
@@ -79,6 +141,36 @@ dict_mode_color = {
     100: '#6B8E23'  # olive drab
 }
 
+dict_shot_dda = {
+    87342: 'T037',
+    84794: 'T052',
+    84791:'T055',
+    84792:'T032',
+    84793:'T030',
+    84795:'T037',
+    84796:'T037',
+    84797:'T012',
+    84798:'T030',
+    87335:'T013',
+    87336:'T033',
+    87337:'T019',
+    87338:'T018',
+    87339:'T029',
+    87340:'T013',
+    87341:'T037',
+    87342:'T037',
+    87344:'T013',
+    87346:'T020',
+    87348:'T015',
+    87349:'T011',
+    87350:'T020',
+}
+
+
+
+
+
+
 keys = [1,2,3,4,5,7,10,20,30,40,50]
 num_colors = len(keys)
 # Create equally spaced colors from the gnuplot colormap
@@ -86,6 +178,16 @@ cmap = plt.get_cmap('rainbow_r')
 colors = [to_hex(cmap(i / (num_colors - 1))) for i in range(num_colors)]
 # Update the dictionary with equally spaced colors
 dict_mode_new_color = dict(zip(keys, colors))
+
+keys = [1,2,3,4,5,7,10,20]
+num_colors = len(keys)
+# Create equally spaced colors from the gnuplot colormap
+cmap = plt.get_cmap('copper_r')
+new_cmap = cmap(np.linspace(0, 0.7, 256))
+new_cmap = mcolors.ListedColormap(new_cmap)
+colors = [to_hex(new_cmap(i / (num_colors - 1))) for i in range(num_colors)]
+# Update the dictionary with equally spaced colors
+dict_mode_newnew_color = dict(zip(keys, colors))
 
 # list_modes = [1, 2, 3, 4, 5, 7, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 # cmap = plt.get_cmap('summer_r')

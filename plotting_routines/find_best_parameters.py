@@ -8,7 +8,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 from hoho import useful_recurring_functions, constant_function,read_kk3_2022
 from thesis import constants
-from hoho import useful_recurring_functions, find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values_old
 from scipy.interpolate import interp1d
 import subprocess
 import subprocess
@@ -151,12 +151,12 @@ def get_reference_function():
 
 def initial_te():
     psis = np.linspace(0.2,1.2,100)
-    # te,ne,dump2 = find_pedestal_values.create_profiles(initial_filename,psis,crit='diamag')
+    # te,ne,dump2 = find_pedestal_values_old.create_profiles(initial_filename,psis,crit='diamag')
 
     try:
-        te,ne,dump2 = find_pedestal_values.create_profiles(initial_filename,psis,profile=1)
+        te,ne,dump2 = find_pedestal_values_old.create_profiles(initial_filename,psis,profile=1)
 
-    except find_pedestal_values.useful_recurring_functions.CustomError:
+    except find_pedestal_values_old.useful_recurring_functions.CustomError:
         print("ouloulou")
     return te
 
@@ -190,9 +190,9 @@ def main():
             psis = np.linspace(0.7,1.2,100)
 
             try:
-                te,ne,dump2 = find_pedestal_values.create_profiles(filename,psis,profile=1)
+                te,ne,dump2 = find_pedestal_values_old.create_profiles(filename,psis,profile=1)
 
-            except find_pedestal_values.useful_recurring_functions.CustomError:
+            except find_pedestal_values_old.useful_recurring_functions.CustomError:
                 continue
 
             distance = distance_functions(to_compare_with, te)

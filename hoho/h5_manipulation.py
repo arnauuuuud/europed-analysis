@@ -1,6 +1,10 @@
 import os, gzip, re, shutil
+from hoho import useful_recurring_functions
+import h5py
 
 def get_latest_version(original_name):
+    foldername = f"{os.environ['EUROPED_DIR']}hdf5"
+    os.chdir(foldername)
     pattern = re.compile(rf'{original_name}_(\d+)_.*\.h5\.gz')
     with os.scandir() as entries:
         files = [entry.name for entry in entries if entry.name.startswith(original_name)]
@@ -15,20 +19,90 @@ def get_latest_version(original_name):
 
 
 def removedoth5(filename):
+    foldername = f"{os.environ['EUROPED_DIR']}hdf5"
+    os.chdir(foldername)
     os.remove(f'{filename}.h5')
 
 def decompress_gz(filename):
+    foldername = f"{os.environ['EUROPED_DIR']}hdf5"
+    os.chdir(foldername)
     with gzip.open(f'{filename}.h5.gz', 'rb') as f_in, open(f'{filename}.h5', 'wb') as f_out:
         shutil.copyfileobj(f_in, f_out)
 
 def compress_to_gz(filename):
+    foldername = f"{os.environ['EUROPED_DIR']}hdf5"
+    os.chdir(foldername)
     with open(f'{filename}.h5', 'rb') as f_in, gzip.open(f'{filename}.h5.gz', 'wb') as f_out:
         shutil.copyfileobj(f_in, f_out)
     removedoth5(filename)
 
-def find_profile_with_delta(file, delta):
+
+def get_data(filename, list_groups):
+    decompress_gz(filename)
+    with h5py.File(f'{filename}.h5', 'r') as hdf5_file:
+        temp = hdf5_file
+        for group in list_groups:
+            # print(group, end='/')
+            temp = temp[group]
+        res = temp[0]
+    removedoth5(filename)
+    return res
+
+def get_data_decrompressed(filename, list_groups):
+    with h5py.File(f'{filename}.h5', 'r') as hdf5_file:
+        temp = hdf5_file
+        for group in list_groups:
+            # print(group, end='/')
+            temp = temp[group]
+        res = temp[0]
+    return res
+
+
+def find_profile_with_delta_name(filename, delta):
+    foldername = f"{os.environ['EUROPED_DIR']}hdf5"
+    os.chdir(foldername)
     res = None
-    for profile in file['scan'].keys():
-        if abs(round((file['scan'][profile]['delta'][0]),5) - delta) < 0.0001:
-            return profile
-    raise useful_recurring_functions.useful_recurring_functions.CustomError(f'No profile in {file} with the given delta {delta} - discrepancy between the delta list from the hdf5, and the different delta of each profile')
+    with h5py.File(f'{filename}.h5', 'r') as h5file:
+        for profile in h5file['scan'].keys():
+            if abs(round((h5file['scan'][profile]['delta'][0]),5) - delta) < 0.0001:
+                res = profile
+
+        if res == None:
+            raise useful_recurring_functions.CustomError(f'No profile in {h5file} with the given delta {delta} - discrepancy between the delta list from the hdf5, and the different delta of each profile')
+    return res
+
+def find_profile_with_delta(filename, delta):
+    decompress_gz(filename)
+    foldername = f"{os.environ['EUROPED_DIR']}hdf5"
+    os.chdir(foldername)
+    res = None
+    with h5py.File(f'{filename}.h5', 'r') as h5file:
+        for profile in h5file['scan'].keys():
+            if abs(round((h5file['scan'][profile]['delta'][0]),5) - delta) < 0.0001:
+                res = profile
+
+        if res == None:
+            raise useful_recurring_functions.CustomError(f'No profile in {h5file} with the given delta {delta} - discrepancy between the delta list from the hdf5, and the different delta of each profile')
+    removedoth5(filename)
+    return res
+
+
+def find_profile_with_delta_file(h5file, delta):
+    res = None
+    for profile in h5file['scan'].keys():
+        if abs(round((h5file['scan'][profile]['delta'][0]),5) - delta) < 0.0001:
+            res = profile
+
+    if res == None:
+        raise useful_recurring_functions.CustomError(f'No profile in {h5file} with the given delta {delta} - discrepancy between the delta list from the hdf5, and the different delta of each profile')
+    return res
+
+def find_profile_with_betaped_file(h5file, delta):
+    res = None
+    for profile in h5file['scan'].keys():
+        if abs(round((h5file['scan'][profile]['betaped'][0]),5) - delta) < 0.0001:
+            res = profile
+
+    if res == None:
+        raise useful_recurring_functions.CustomError(f'No profile in {h5file} with the given betaped {delta} - discrepancy between the betaped list from the hdf5, and the different betaped of each profile')
+    return res

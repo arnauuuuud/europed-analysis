@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -128,7 +128,7 @@ def main(prefixes, firstname, middlname, crit, crit_value, labels, legendtitle, 
                             proportionality -= 0.01
 
                     if y_crit is  None:
-                        raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical value found")
+                        raise useful_recurring_functions.CustomError(f"No critical value found")
 
                     
                     list_eta.append(float(prefix))

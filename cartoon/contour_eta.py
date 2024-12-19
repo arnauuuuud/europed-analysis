@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -119,7 +119,7 @@ def get_psin_sig(europed_name, profile):
 
 def get_sig_pos(europed_name, profile):
     #profile = get_adapted_profile_number(europed_name, profile)
-    te_pars, ne_pars = find_pedestal_values.find_profile_pars(europed_name, profile)
+    te_pars, ne_pars = find_pedestal_values_old.find_profile_pars(europed_name, profile)
     pos = float(te_pars[3])
     delta = float(te_pars[4])
 
@@ -217,16 +217,16 @@ def main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid
                 try:
                     argmax = np.nanargmax(tab[profile])
                     gamma = tab[profile, argmax]
-                    ne = tab_ne[profile]
-                    Te = tab_Te[profile]
+                    neped,teped = find_pedestal_values_old.pedestal_values(europed_run,profile)
+
                     
                     eta_middle_ped = get_eta_pos(europed_run, profile)
                     
 
                     list_n.append(global_n[argmax])
                     z.append(gamma)
-                    x.append(ne)
-                    y.append(Te)
+                    x.append(neped)
+                    y.append(teped)
                     list_eta.append(eta_middle_ped)
                 except ValueError:
                     print("ca marche pas du tout")

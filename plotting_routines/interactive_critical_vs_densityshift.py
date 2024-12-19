@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, find_pedestal_values
+from hoho import useful_recurring_functions, europed_analysis, global_functions,startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -223,15 +223,15 @@ def main(prefixes, variations, firstnames, middlname, crit, crit_value, labels, 
 
                         has_unstable, y_crit, i_mode = europed_analysis.find_critical(x_param, tab, crit_value, filter_wrong_slope)
                         if y_crit is  None:
-                            raise useful_recurring_functions.useful_recurring_functions.CustomError(f"No critical value found")
+                            raise useful_recurring_functions.CustomError(f"No critical value found")
 
                         list_ycrit.append(y_crit)
 
                         if plot == 'frac':
-                            frac = find_pedestal_values.get_frac(europed_run, crit)
+                            frac = find_pedestal_values_old.get_frac(europed_run, crit)
                             list_frac.append(frac)
                         elif plot == 'nesep':
-                            nesep = find_pedestal_values.get_nesep(europed_run, crit)
+                            nesep = find_pedestal_values_old.get_nesep(europed_run, crit)
                             list_nesep.append(nesep)
 
                         if i_mode == -1:

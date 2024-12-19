@@ -4,7 +4,7 @@
 from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, get_eigenfunction
 import argparse
 import matplotlib.pyplot as plt
-from hoho import useful_recurring_functions, find_pedestal_values
+from hoho import useful_recurring_functions, find_pedestal_values_old
 from pylib import castor
 
 def argument_parser():

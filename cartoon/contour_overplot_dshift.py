@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, europed_analysis, global_functions, startup
+from hoho import useful_recurring_functions, europed_analysis, global_functions, startup, find_pedestal_values_old
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,6 +19,7 @@ def argument_parser():
     parser.add_argument("-v", "--critical_value", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
 
     parser.add_argument("-p", "--pressure", action = 'store_const', const = 'pe', dest = 'ypar', default = 'te', help= "pressure on yaxis instead of temperature")
+    parser.add_argument("-f", "--frac", action = 'store_const', const = True, dest = 'plot_frac', default = False, help= "pressure on yaxis instead of temperature")
 
 
     group = parser.add_mutually_exclusive_group()
@@ -39,9 +40,9 @@ def argument_parser():
     if variations == ["full_list"]:
         variations = ['-0.0100','-0.0050','0.0000','0.0500','0.0100','0.0150','0.0200','0.0250','0.0300','0.0350','0.0400']
 
-    return args.prefix, variations, args.suffix, args.crit, critical_value, args.ypar, args.exclud_mode, args.consid_mode
+    return args.prefix, variations, args.suffix, args.crit, critical_value, args.ypar, args.exclud_mode, args.consid_mode, args.plot_frac
 
-def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode):
+def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode_input,plot_frac):
 
     if crit_value is None:
         if crit == "alfven":
@@ -49,18 +50,22 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
         elif crit == "diamag":
             crit_value=0.25
 
-    fig, ax = plt.subplots(figsize=(12,9))
+    fig, ax = plt.subplots(figsize=(9,7))
 
     colors = [
         ['red','blue'],
-        ['orange','green']
+        ['orange','green'],
+        ['purple','yellow'],
+        ['pink','brown']
         ]
 
     for i,prefix in enumerate(prefixes):
         color_temp = colors[i]
         z = []
         x = []
+        list_ne = []
         y = []
+        list_dshift = []
         for variation in variations:
             bool_first = True
             europed_run= prefix + variation
@@ -70,20 +75,14 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
             print(europed_run)
 
             try:
-                gammas, modes = europed_analysis.get_gammas(europed_run, crit)
-                tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode, exclud_mode)
-                tab_ne,tab_Te = europed_analysis.get_nT(europed_run)
+                try:
+                    gammas, modes = europed_analysis.get_gammas(europed_run, crit)
+                except IndexError:
+                    continue
+                tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode_input, exclud_mode)
 
 
-                def remove_wrong_slopes(tab):
-                    temp_tab = tab
-                    for j in range(len(temp_tab[0])):
-                        for i in range(len(temp_tab)-1):
-                            if temp_tab[i,j]>temp_tab[i+1,j]: 
-                                for poupou in range(i+1):
-                                    temp_tab[poupou,j] = None
-                    return temp_tab
-                
+                     
                 #tab = remove_wrong_slopes(tab)
 
                 for profile in range(len(tab[:,0])):
@@ -91,82 +90,131 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
                         argmax = np.nanargmax(tab[profile])
                         gamma = tab[profile, argmax]
                         ne = tab_ne[profile]
-                        dshift = variation
-                        Te = tab_Te[profile]
+                        dshift = float(variation)
+                        if plot_frac:
+                            dshift = float(find_pedestal_values_old.get_frac(europed_run, profile=profile))
+
+
+                        neped,teped = find_pedestal_values_old.pedestal_values(europed_run,profile)
+
 
                         z.append(gamma)
-                        x.append(float(dshift))
-                        y.append(Te)
+                        x.append(dshift)
+                        y.append(teped)
+                        list_ne.append(neped)
                     except ValueError:
                         print("ca marche pas du tout")
-            except FileNotFoundError:
+            except (IndexError,FileNotFoundError):
                 print(f"{europed_run:>40} FILE NOT FOUND")
 
+        x = np.array(x)
+        y = np.array(y)
+        z = np.array(z)
         valid_indices = ~np.isnan(x) & ~np.isnan(y) & ~np.isnan(z)
         x = np.array(x)[valid_indices]
         y = np.array(y)[valid_indices]
         z = np.array(z)[valid_indices]
+        list_ne = np.array(list_ne)[valid_indices]
 
-        pressure = 1.6*x*y
+        pressure = 1.6*list_ne*y
         unique_x = list(set(x))
         unique_x = sorted(unique_x)
 
+        if ypar == 'te':
+            triang = tri.Triangulation(x,y)
 
-        triang = tri.Triangulation(x,y)
+            # Filter out triangles connecting x=-1 and x=1
+            triangles_to_keep = []
+            for triangle in triang.triangles:
+                x_values = x[triangle]
+                distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
+                if np.all(distances <= 1):
+                    triangles_to_keep.append(triangle)
+                else:
+                    print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
 
-        # Filter out triangles connecting x=-1 and x=1
-        triangles_to_keep = []
-        for triangle in triang.triangles:
-            x_values = x[triangle]
-            distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
-            if np.all(distances <= 1):
-                triangles_to_keep.append(triangle)
-            else:
-                print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
+            # Create a new Triangulation object with filtered triangles
+            filtered_triang = tri.Triangulation(x, y)#, triangles=np.array(triangles_to_keep))
 
-        # Create a new Triangulation object with filtered triangles
-        filtered_triang_te = tri.Triangulation(x, y, triangles=np.array(triangles_to_keep))
+        elif ypar == 'pe':
+            triang = tri.Triangulation(x,pressure)
 
+            # Filter out triangles connecting x=-1 and x=1
+            triangles_to_keep = []
+            for triangle in triang.triangles:
+                x_values = x[triangle]
+                distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
+                if np.all(distances <= 1):
+                    triangles_to_keep.append(triangle)
+                else:
+                    print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
 
-        triang = tri.Triangulation(x,pressure)
+            # Create a new Triangulation object with filtered triangles
+            filtered_triang = tri.Triangulation(x, pressure)#, triangles=np.array(triangles_to_keep))
 
-        # Filter out triangles connecting x=-1 and x=1
-        triangles_to_keep = []
-        for triangle in triang.triangles:
-            x_values = x[triangle]
-            distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
-            if np.all(distances <= 1):
-                triangles_to_keep.append(triangle)
-            else:
-                print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
-
-        # Create a new Triangulation object with filtered triangles
-        filtered_triang = tri.Triangulation(x, pressure, triangles=np.array(triangles_to_keep))
-
-
-        #ax.plot(x, pressure, 'bo')
-
-        contour_te = plt.tricontour(filtered_triang_te, z, levels=[crit_value],linewidths=0)
-        contour_path = contour_te.collections[0].get_paths()[0]
-        vertices = contour_path.vertices
-        #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linewidth=2)
-
-        contour_te = plt.tricontour(filtered_triang_te, z, levels=[0.85*crit_value],linewidths=0)
-        contour_path = contour_te.collections[0].get_paths()[0]
-        vertices = contour_path.vertices
-        #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
-
-        contour_te = plt.tricontour(filtered_triang_te, z, levels=[1.15*crit_value],linewidths=0)
-        contour_path = contour_te.collections[0].get_paths()[0]
-        vertices = contour_path.vertices
-        #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
 
         cs = ax.tricontour(filtered_triang, z, levels=[crit_value],colors=color_temp[0])
-        #ax.tricontour(filtered_triang, z, levels=[0.85*crit_value,1.15*crit_value],colors=color_temp[0], linestyles='dashed')
-        # plt.clabel(cs, use_clabeltext =True, fmt='%1.2f',fontsize=10)
-        #ax.set_ylim(bottom=0)
+        ax.tricontour(filtered_triang, z, levels=[0.85*crit_value],colors=color_temp[0], linestyles='dashed')
+        ax.tricontour(filtered_triang, z, levels=[1.15*crit_value],colors=color_temp[0], linestyles='dashed')
 
-        #plt.clabel(cs, use_clabeltext =True, fmt='%1.2f',fontsize=10)
+
+
+        # triang = tri.Triangulation(x,y)
+
+
+        # # Filter out triangles connecting x=-1 and x=1
+        # triangles_to_keep = []
+        # for triangle in triang.triangles:
+        #     x_values = x[triangle]
+        #     distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
+        #     if np.all(distances <= 1):
+        #         triangles_to_keep.append(triangle)
+        #     else:
+        #         print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
+
+        # # Create a new Triangulation object with filtered triangles
+        # filtered_triang_te = tri.Triangulation(x, y, triangles=np.array(triangles_to_keep))
+
+
+        # triang = tri.Triangulation(x,pressure)
+
+        # # Filter out triangles connecting x=-1 and x=1
+        # triangles_to_keep = []
+        # for triangle in triang.triangles:
+        #     x_values = x[triangle]
+        #     distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
+        #     if np.all(distances <= 1):
+        #         triangles_to_keep.append(triangle)
+        #     else:
+        #         print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
+
+        # # Create a new Triangulation object with filtered triangles
+        # filtered_triang = tri.Triangulation(x, pressure, triangles=np.array(triangles_to_keep))
+
+
+        # #ax.plot(x, pressure, 'bo')
+
+        # contour_te = plt.tricontour(filtered_triang_te, z, levels=[crit_value],linewidths=0)
+        # contour_path = contour_te.collections[0].get_paths()[0]
+        # vertices = contour_path.vertices
+        # #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linewidth=2)
+
+        # contour_te = plt.tricontour(filtered_triang_te, z, levels=[0.85*crit_value],linewidths=0)
+        # contour_path = contour_te.collections[0].get_paths()[0]
+        # vertices = contour_path.vertices
+        # #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
+
+        # contour_te = plt.tricontour(filtered_triang_te, z, levels=[1.15*crit_value],linewidths=0)
+        # contour_path = contour_te.collections[0].get_paths()[0]
+        # vertices = contour_path.vertices
+        # #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
+
+        # cs = ax.tricontour(filtered_triang, z, levels=[crit_value],colors=color_temp[0])
+        # #ax.tricontour(filtered_triang, z, levels=[0.85*crit_value,1.15*crit_value],colors=color_temp[0], linestyles='dashed')
+        # # plt.clabel(cs, use_clabeltext =True, fmt='%1.2f',fontsize=10)
+        # #ax.set_ylim(bottom=0)
+
+        # #plt.clabel(cs, use_clabeltext =True, fmt='%1.2f',fontsize=10)
 
     if ypar == 'te':
     #     cs = ax.contour(X_smooth, Y_te_smooth, Y_pe_smooth, levels=[0.5,1,1.5, 2],colors='k', linewidths = 1)
@@ -182,9 +230,11 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
     #plt.clabel(cs, use_clabeltext =True, fmt='%1.1f',fontsize=8)
         
     custom_legend2 = [
-        plt.Line2D([0], [0], linewidth=1, color=colors[0][0], label=r'Ideal MHD'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[0][0], label=r'$\eta=0$'),
         #plt.Line2D([0], [0], linewidth=1, color=colors[0][1], label=r'$\eta=0$ - interpolation from temperature'),
-        plt.Line2D([0], [0], linewidth=1, color=colors[1][0], label=r'Resistive MHD, Spitzer resistivity'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[1][0], label=r'$\eta=\eta_{Sp}$'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[2][0], label=r'$\eta=1.5\eta_{Sp}$'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[3][0], label=r'$\eta=2\eta_{Sp}$'),
         #plt.Line2D([0], [0], linewidth=1, color=colors[1][1], label=r'$\eta=1$ - interpolation from temperature'),
         ]
     ax.legend(handles=custom_legend2, loc='lower right', fontsize=14) 
@@ -194,9 +244,11 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
     nelabel, shit = global_functions.get_plot_labels_gamma_profiles('neped',crit)
     
 
-    ax.set_xlabel('Relative shift [%]', fontsize=20)
+    ax.set_xlabel('Relative shift', fontsize=20)
+    if plot_frac:
+        ax.set_xlabel(r'$n_e^{sep}/n_e^{ped}$', fontsize=20)
     ax.set_ylabel(ylabel, fontsize=20)
-
+    ax.set_ylim(bottom=0,top=1.5)
     
 
     #fig.colorbar(contour, label=gammalabel)
@@ -204,5 +256,5 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
     plt.show()
 
 if __name__ == '__main__':
-    prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode = argument_parser()
-    main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode)
+    prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode, plot_frac = argument_parser()
+    main(prefix, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode, plot_frac)

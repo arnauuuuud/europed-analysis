@@ -41,7 +41,7 @@ def argument_parser():
 
     return args.prefix, variations, args.suffix, args.crit, critical_value, args.ypar, args.exclud_mode, args.consid_mode
 
-def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode):
+def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, consid_mode_input):
 
     if crit_value is None:
         if crit == "alfven":
@@ -49,11 +49,13 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
         elif crit == "diamag":
             crit_value=0.25
 
-    fig, ax = plt.subplots(figsize=(12,9))
+    fig, ax = plt.subplots(figsize=(9,7))
 
     colors = [
         ['red','blue'],
-        ['orange','green']
+        ['orange','green'],
+        ['purple','yellow'],
+        ['pink','brown']
         ]
 
     for i,prefix in enumerate(prefixes):
@@ -62,7 +64,6 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
         x = []
         y = []
         for variation in variations:
-            bool_first = True
             europed_run= prefix + variation
             if suffix :
                 europed_run += suffix
@@ -71,34 +72,21 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
 
             try:
                 gammas, modes = europed_analysis.get_gammas(europed_run, crit)
-                tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode, exclud_mode)
-                tab_ne,tab_Te = europed_analysis.get_nT(europed_run)
+                tab, consid_mode = europed_analysis.filter_tab_general(gammas, modes, consid_mode_input, exclud_mode)
 
-
-                def remove_wrong_slopes(tab):
-                    temp_tab = tab
-                    for j in range(len(temp_tab[0])):
-                        for i in range(len(temp_tab)-1):
-                            if temp_tab[i,j]>temp_tab[i+1,j]: 
-                                for poupou in range(i+1):
-                                    temp_tab[poupou,j] = None
-                    return temp_tab
-                
-                #tab = remove_wrong_slopes(tab)
 
                 for profile in range(len(tab[:,0])):
                     try:
                         argmax = np.nanargmax(tab[profile])
                         gamma = tab[profile, argmax]
-                        ne = tab_ne[profile]
-                        Te = tab_Te[profile]
+                        neped,teped = find_pedestal_values_old.pedestal_values(europed_run,profile)
 
                         z.append(gamma)
-                        x.append(ne)
-                        y.append(Te)
+                        x.append(neped)
+                        y.append(teped)
                     except ValueError:
                         print("ca marche pas du tout")
-            except FileNotFoundError:
+            except (IndexError,FileNotFoundError):
                 print(f"{europed_run:>40} FILE NOT FOUND")
 
         valid_indices = ~np.isnan(x) & ~np.isnan(y) & ~np.isnan(z)
@@ -106,51 +94,59 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
         y = np.array(y)[valid_indices]
         z = np.array(z)[valid_indices]
 
-        x_smooth = np.linspace(min(x),max(x),1000)
-        y_te_smooth = np.linspace(np.nanmin(y),np.nanmax(y),1000)
-        
-        X_smooth, Y_te_smooth = np.meshgrid(x_smooth, y_te_smooth)
-        Y_pe_smooth = 1.6*X_smooth*Y_te_smooth
-
         pressure = 1.6*x*y
         unique_x = list(set(x))
         unique_x = sorted(unique_x)
 
 
-        triang = tri.Triangulation(x,y)
+        if ypar == 'te':
+            triang = tri.Triangulation(x,y)
 
-        # Filter out triangles connecting x=-1 and x=1
-        triangles_to_keep = []
-        for triangle in triang.triangles:
-            x_values = x[triangle]
-            distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
-            if np.all(distances <= 1):
-                triangles_to_keep.append(triangle)
-            else:
-                print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
+            # Filter out triangles connecting x=-1 and x=1
+            triangles_to_keep = []
+            for triangle in triang.triangles:
+                x_values = x[triangle]
+                distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
+                if np.all(distances <= 1):
+                    triangles_to_keep.append(triangle)
+                else:
+                    print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
 
-        # Create a new Triangulation object with filtered triangles
-        filtered_triang_te = tri.Triangulation(x, y, triangles=np.array(triangles_to_keep))
+            # Create a new Triangulation object with filtered triangles
+            filtered_triang = tri.Triangulation(x, y, triangles=np.array(triangles_to_keep))
 
+        elif ypar == 'pe':
+            triang = tri.Triangulation(x,pressure)
 
-        triang = tri.Triangulation(x,pressure)
+            # Filter out triangles connecting x=-1 and x=1
+            triangles_to_keep = []
+            for triangle in triang.triangles:
+                x_values = x[triangle]
+                distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
+                if np.all(distances <= 1):
+                    triangles_to_keep.append(triangle)
+                else:
+                    print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
 
-        # Filter out triangles connecting x=-1 and x=1
-        triangles_to_keep = []
-        for triangle in triang.triangles:
-            x_values = x[triangle]
-            distances = np.array([np.abs(unique_x.index(x)-unique_x.index(y)) for x in x_values for y in x_values])
-            if np.all(distances <= 1):
-                triangles_to_keep.append(triangle)
-            else:
-                print(f'FILTERED TRIANGLE: {triangle} OF X VALUES {x_values}')
-
-        # Create a new Triangulation object with filtered triangles
-        filtered_triang = tri.Triangulation(x, pressure, triangles=np.array(triangles_to_keep))
-
-
+            # Create a new Triangulation object with filtered triangles
+            filtered_triang = tri.Triangulation(x, pressure, triangles=np.array(triangles_to_keep))
 
 
+        cs = ax.tricontour(filtered_triang, z, levels=[crit_value],colors=color_temp[0])
+        ax.tricontour(filtered_triang, z, levels=[0.85*crit_value],colors=color_temp[0], linestyles='dashed')
+        ax.tricontour(filtered_triang, z, levels=[1.15*crit_value],colors=color_temp[0], linestyles='dashed')
+
+        del filtered_triang
+        del z
+        del triang
+        del x 
+        del y
+        del tab
+        del gammas 
+        del modes
+        del pressure
+        del tab_ne
+        del tab_Te
 
 
         # ax.triplot(filtered_triang, linestyle='dotted',color='blue')
@@ -163,22 +159,22 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
 
         #ax.plot(x, pressure, 'bo')
 
-        contour_te = plt.tricontour(filtered_triang_te, z, levels=[crit_value],linewidths=0)
-        contour_path = contour_te.collections[0].get_paths()[0]
-        vertices = contour_path.vertices
-        #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linewidth=2)
+        # # contour_te = plt.tricontour(filtered_triang_te, z, levels=[crit_value],linewidths=0)
+        # contour_path = contour_te.collections[0].get_paths()[0]
+        # vertices = contour_path.vertices
+        # # ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linewidth=2)
 
-        contour_te = plt.tricontour(filtered_triang_te, z, levels=[0.85*crit_value],linewidths=0)
-        contour_path = contour_te.collections[0].get_paths()[0]
-        vertices = contour_path.vertices
-        #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
+        # contour_te = plt.tricontour(filtered_triang_te, z, levels=[0.85*crit_value],linewidths=0)
+        # contour_path = contour_te.collections[0].get_paths()[0]
+        # vertices = contour_path.vertices
+        # # ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
 
-        contour_te = plt.tricontour(filtered_triang_te, z, levels=[1.15*crit_value],linewidths=0)
-        contour_path = contour_te.collections[0].get_paths()[0]
-        vertices = contour_path.vertices
-        #ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
+        # contour_te = plt.tricontour(filtered_triang_te, z, levels=[1.15*crit_value],linewidths=0)
+        # contour_path = contour_te.collections[0].get_paths()[0]
+        # vertices = contour_path.vertices
+        # ax.plot(vertices[:, 0], 1.6*vertices[:,0]*vertices[:, 1], color=color_temp[1], linestyle='dashed', linewidth=2)
 
-        cs = ax.tricontour(filtered_triang, z, levels=[crit_value],colors=color_temp[0])
+        # cs = ax.tricontour(filtered_triang, z, levels=[crit_value],colors=color_temp[0])
         #ax.tricontour(filtered_triang, z, levels=[0.85*crit_value,1.15*crit_value],colors=color_temp[0], linestyles='dashed')
         # plt.clabel(cs, use_clabeltext =True, fmt='%1.2f',fontsize=10)
         #ax.set_ylim(bottom=0)
@@ -199,22 +195,25 @@ def main(prefixes, variations, suffix, crit, crit_value, ypar, exclud_mode, cons
     #plt.clabel(cs, use_clabeltext =True, fmt='%1.1f',fontsize=8)
         
     custom_legend2 = [
-        plt.Line2D([0], [0], linewidth=1, color=colors[0][0], label=r'Ideal MHD'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[0][0], label=r'$\eta=0$'),
         #plt.Line2D([0], [0], linewidth=1, color=colors[0][1], label=r'$\eta=0$ - interpolation from temperature'),
-        plt.Line2D([0], [0], linewidth=1, color=colors[1][0], label=r'Resistive MHD, Spitzer resistivity'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[1][0], label=r'$\eta=\eta_{Sp}$'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[2][0], label=r'$\eta=1.5\eta_{Sp}$'),
+        plt.Line2D([0], [0], linewidth=1, color=colors[3][0], label=r'$\eta=2.0\eta_{Sp}$'),
         #plt.Line2D([0], [0], linewidth=1, color=colors[1][1], label=r'$\eta=1$ - interpolation from temperature'),
         ]
     ax.legend(handles=custom_legend2, loc='lower right', fontsize=14) 
 
 
 
-    nelabel, shit = global_functions.get_plot_labels_gamma_profiles('neped',crit)
+    # nelabel, shit = global_functions.get_plot_labels_gamma_profiles('neped',crit)
     
 
-    ax.set_xlabel(nelabel, fontsize=20)
+    ax.set_xlabel(r'$n_e^{ped}$', fontsize=20)
     ax.set_ylabel(ylabel, fontsize=20)
 
-    
+    ax.set_ylim(bottom=0,top=2)
+
 
     #fig.colorbar(contour, label=gammalabel)
     fig.tight_layout()

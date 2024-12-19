@@ -60,11 +60,7 @@ def extract_psi_and_j(filename):
 
 
 def plot(filename, ax, name):
-
-    
-
     psi_values, j_values = extract_psi_and_j(filename)
-
     ax.plot(psi_values,j_values, label=name)
     ax.set_xlabel(r'$\psi_N$')
     ax.set_ylabel(r'$\left< J \right>$ [a.u.]')
@@ -85,12 +81,10 @@ def get_helena_filename(europed_name):
             else:
                 continue
 
-
 def main(europed_name, profile):
     fig, ax = plt.subplots()
 
     for name in europed_name:
-
         runid = get_helena_filename(name)
         helena_name = f'jet84794.{runid}_{profile}.out'
         print(helena_name)
