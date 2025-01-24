@@ -1,4 +1,4 @@
-from hoho import europed_analysis_2, h5_manipulation, pedestal_values
+from hoho import europed_analysis_2, h5_manipulation, pedestal_values, alpha_profiles
 import numpy as np
 import matplotlib.tri as tri
 import os
@@ -60,6 +60,8 @@ def create_lists(europed_names, xaxis, yaxis, crit, consid_mode_input, exclud_mo
         tab.append([])
         bool_first = True
         dict_gamma = europed_analysis_2.get_filtered_dict(europed_name, crit, consid_modes=consid_mode_input, exclud_modes=exclud_mode)
+        if crit == 'diamag':
+            dict_gamma = europed_analysis_2.remove_wrong_slope(dict_gamma)
         for delta in dict_gamma.keys():
             dict_gamma_profile = dict_gamma[delta]
             try:
@@ -81,6 +83,14 @@ def create_lists(europed_names, xaxis, yaxis, crit, consid_mode_input, exclud_mo
                         value = float(h5_manipulation.get_data(europed_name,['scan',str(profile),'betap']))
                     elif par == 'alpha':
                         value = float(h5_manipulation.get_data(europed_name,['scan',str(profile),'alpha_helena_max']))
+                    elif par == 'alpha_average_ped':
+                        value = alpha_profiles.average_pedestal_width(europed_name, profile = profile)
+                    elif par == 'alpha_fixed_value':
+                        value = alpha_profiles.average_fixed_value(europed_name, profile = profile)
+                    elif par == 'alpha_fixed_value2':
+                        value = alpha_profiles.average_fixed_value2(europed_name, profile = profile)
+                    elif par == 'delta':
+                        value = float(pedestal_values.get_fit_width(europed_name, 'pe', profile=profile))
 
 
                     if isx:

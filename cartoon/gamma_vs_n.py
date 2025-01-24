@@ -28,7 +28,7 @@ def main(europed_name, delta):
 
     h5_manipulation.decompress_gz(europed_name)
     with h5py.File(f'{europed_name}.h5', 'a') as h5file:
-        profile = h5_manipulation.find_profile_with_delta(h5file, delta)
+        profile = h5_manipulation.find_profile_with_delta_file(h5file, delta)
 
         print(profile)
         for key in h5file['scan'][profile]['castor'].keys():

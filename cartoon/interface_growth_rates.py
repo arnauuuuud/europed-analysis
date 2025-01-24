@@ -23,7 +23,7 @@ colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'gold', 'orange', 'purple',
 
 
 
-def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode, hline, vline, legend, fixed_width, q_ped_def):
+def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode, hline, vline, legend, fixed_width, q_ped_def, wrongslope):
 
     startup.reload(global_functions)
     startup.reload(useful_recurring_functions)
@@ -62,11 +62,11 @@ def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode
 
     for iplot,europed_run in enumerate(europed_names):
         try:
-            x_param = europed_analysis_2.get_x_parameter_with_stability(europed_run, x_parameter, q_ped_def)
+            x_param = europed_analysis_2.get_x_parameter(europed_run, x_parameter, q_ped_def)
             if not fixed_width:
-                deltas = europed_analysis_2.get_x_parameter_with_stability(europed_run, 'delta')
+                deltas = europed_analysis_2.get_x_parameter(europed_run, 'delta')
             else:
-                deltas = europed_analysis_2.get_x_parameter_with_stability(europed_run, 'betaped')
+                deltas = europed_analysis_2.get_x_parameter(europed_run, 'betaped')
             # deltas = europed_analysis_2.get_x_parameter(europed_run, 'delta')
 
             # if type(res) == str and res == 'File not found':
@@ -87,6 +87,8 @@ def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode
 
             dict_gamma = europed_analysis_2.get_gammas(europed_run, crit, fixed_width)
             dict_gamma = europed_analysis_2.filter_dict(dict_gamma, list_consid_mode)
+            if wrongslope:
+                dict_gamma = europed_analysis_2.remove_wrong_slope(dict_gamma)
             dict_gamma_r = europed_analysis_2.reverse_nested_dict(dict_gamma)
 
             # for mode in dict_gamma_r.keys():
@@ -101,9 +103,10 @@ def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode
                 for mode in dict_gamma_r.keys():
                     dict_gamma_n = dict_gamma_r[mode]
                     deltas_to_plot = list(dict_gamma_n.keys())
-                    x_to_plot = europed_analysis_2.give_matching_x_with_deltas(sorted(deltas), sorted(x_param), deltas_to_plot)                   
+                    x_to_plot = europed_analysis_2.give_matching_x_with_deltas(sorted(deltas), sorted(x_param), deltas_to_plot)
                     y = list(dict_gamma_n.values())
                     plot_ax.plot(x_to_plot, y, color=global_functions.dict_mode_color[int(mode)], marker=markers[iplot], label=f'{europed_run} - {mode}')
+                    # plot_ax.plot(x_to_plot, y)
                 # for i, mode in enumerate(list_mode_to_plot):
                 #     temp_x = x_param
                 #     temp_y = tab[:,i]
@@ -137,6 +140,7 @@ def run(europed_names, x_parameter, crit, crit_value, envelope, list_consid_mode
                         x_crit_round = np.around(np.around(x_crit*10**-x_crit_order,2)*10**x_crit_order,6)
                         plot_ax.text(x_crit, 1.0, str(x_crit_round), color=colorvline, horizontalalignment='center', verticalalignment='bottom',transform=trans)
                     except ValueError:
+                        traceback.print_exc()
                         pass
         except RuntimeError:
             print(f"{europed_run:>40} RUNTIME ERROR : NO FIT FOUND")
@@ -249,6 +253,7 @@ def on_button_click():
 
     hline = checkbox_hline.isChecked()
     vline = checkbox_vline.isChecked()
+    wrongslope = checkbox_wrongslope.isChecked()
     envelope = checkbox_envelope.isChecked()
     legend = checkbox_legend.isChecked()
     crit_value = float(crit_value_edit.text())
@@ -259,7 +264,7 @@ def on_button_click():
 
     # Update the plot with new data
     try:
-        run(text_values, x_parameter, crit, crit_value, envelope, list_consid_mode, hline, vline, legend, fixed_width, q_ped_def)
+        run(text_values, x_parameter, crit, crit_value, envelope, list_consid_mode, hline, vline, legend, fixed_width, q_ped_def, wrongslope)
     except Exception as e:
         print()
         print(f'    AN EXCEPTION WAS RAISED: {e}')
@@ -334,7 +339,7 @@ if __name__ == '__main__':
     check_all_button.clicked.connect(checkAll)
     none_button.clicked.connect(uncheckAll)
     n_label = QLabel("n")
-    checkboxes_n = [QCheckBox(str(n_value)) for n_value in [1, 2, 3, 4, 5, 7, 10, 20, 30, 40, 50]]
+    checkboxes_n = [QCheckBox(str(n_value)) for n_value in [1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 30, 40, 50]]
     for checkbox in checkboxes_n:
         checkbox.setChecked(True)
 
@@ -346,6 +351,7 @@ if __name__ == '__main__':
     empty_label = QLabel("")
     checkbox_hline = QCheckBox("H line")
     checkbox_vline = QCheckBox("V line")
+    checkbox_wrongslope = QCheckBox("Wrong slope")
     checkbox_envelope = QCheckBox("Envelope")
     checkbox_legend = QCheckBox("Legend")
     checkbox_legend.setChecked(True)
@@ -414,6 +420,7 @@ if __name__ == '__main__':
     rest_layout.addWidget(empty_label)
     rest_layout.addWidget(checkbox_hline)
     rest_layout.addWidget(checkbox_vline)
+    rest_layout.addWidget(checkbox_wrongslope)
     rest_layout.addWidget(checkbox_envelope)
     rest_layout.addWidget(checkbox_legend)
 

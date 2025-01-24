@@ -87,8 +87,12 @@ def main(xy, ax):
     #     plot(ax, europed_name, 'blue', crit_value_resis, 'o', False, xy=xy)
     # for europed_name in ['tan_eta1_rs0.03_neped2.8_betap0.95_kbm0.15']:
     #     plot(ax, europed_name, 'red', crit_value_resis, 'o', False, xy=xy)
-    for europed_name in ['tan_eta1_rs0.025_neped2.8_betap0.95']:
+    for europed_name in ['tan_eta1_rs0.023_neped2.8_betap0.95','tan_eta1_rs0.024_neped2.8_betap0.95','tan_eta1_rs0.025_neped2.8_betap0.95']:
         plot(ax, europed_name, 'green', crit_value_resis, 'o', False, xy=xy)
+    for europed_name in ['tan_eta1_rs0.026_neped2.8_betap0.95','tan_eta1_rs0.027_neped2.8_betap0.95']:
+        plot(ax, europed_name, 'blue', crit_value_resis, 'o', False, xy=xy)
+    for europed_name in ['tan_eta1_rs0.028_neped2.8_betap0.95','tan_eta1_rs0.029_neped2.8_betap0.95']:
+        plot(ax, europed_name, 'blue', crit_value_resis, 'o', False, xy=xy)
     # for europed_name in ['tan_eta1_rs0.025_neped2.8_betap0.95_kbm0.15']:
     #     plot(ax, europed_name, 'pink', crit_value_resis, 'o', False, xy=xy)
     # for europed_name in ['tan_eta1_rs0.04_neped2.8_betap0.95_kbm0.15']:
@@ -133,11 +137,11 @@ def main(xy, ax):
 if __name__ == '__main__':
     fig, axs = plt.subplots(2,3)
     main('alphapeped',axs[0,0])
-    # main('nepedteped',axs[0,1])
-    # main('sepedwidthbis',axs[1,0])
-    # # # main('deltadelta',axs[1,1])
-    # main('betapbetan',axs[1,1])
-    # main('relshrelsh',axs[1,2])
+    main('nepedteped',axs[0,1])
+    main('sepedwidthbis',axs[1,0])
+    # # main('deltadelta',axs[1,1])
+    main('betapbetan',axs[1,1])
+    main('relshrelsh',axs[1,2])
     axs[1,2].text(0.05,0.05, f'Threshold: {crit_value_resis}', transform=axs[1,2].transAxes)
     plt.show()
     plt.close()

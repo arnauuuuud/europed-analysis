@@ -101,6 +101,9 @@ def run(europed_names, y_parameter, crit, crit_values, list_consid_mode, shown, 
                         except IndexError as e:
                             print(e)
                             pass
+                        except KeyError as e:
+                            print(e)
+                            pass
 
 
         if whichxparameter == 2:

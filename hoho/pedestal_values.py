@@ -70,8 +70,8 @@ def get_critical_pars(europed_name, crit='alfven', crit_value=0.03, exclud_mode 
 
 def create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = None, list_consid_mode = None, fixed_width=False):
     profile_below, profile_above, ratio = critical_profile_number(europed_name, crit, crit_value, exclud_mode, list_consid_mode, fixed_width)
-    te_below, ne_below = create_profiles(europed_name, psis, profile=profile_below)
-    te_above, ne_above = create_profiles(europed_name, psis, profile=profile_above)
+    te_below, ne_below = create_standard_profiles(europed_name, psis, profile=profile_below)
+    te_above, ne_above = create_standard_profiles(europed_name, psis, profile=profile_above)
     interp_ne = interp2d(psis,[0,1],[ne_below, ne_above])
     interp_te = interp2d(psis,[0,1],[te_below, te_above])
     ne_profile_crit = interp_ne(psis,ratio)
@@ -85,9 +85,11 @@ def critical_profile_number(europed_name, crit='alfven', crit_value=0.03, exclud
     else:
         deltas = hdf5_data.get_xparam(europed_name, 'betaped')
     dict_gammas = europed_analysis_2.get_filtered_dict(europed_name, crit, list_consid_mode, exclud_mode, fixed_width)
+    if crit =='diamag':
+        dict_gammas = europed_analysis_2.remove_wrong_slope(dict_gammas)
     has_unstable, delta_crit, mode = europed_analysis_2.find_critical(deltas, deltas, dict_gammas, crit_value)
     try:
-        delta_below = np.max([d for d in deltas if d < delta_crit])
+        delta_below = np.max([d for d in deltas if d <= delta_crit])
     except ValueError:
         return None, None, None
     delta_above = np.min([d for d in deltas if d > delta_crit])
@@ -124,7 +126,7 @@ def create_profiles(europed_name, psis, profile=None, crit=None, crit_value=0.03
         return None, None
 
 def create_pressure_profile(europed_name, psis, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None, fixed_width=False):
-    te_p, ne_p = create_profiles(europed_name, psis, profile, crit, crit_value, exclud_mode, list_consid_mode, fixed_width)
+    te_p, ne_p = create_profiles(europed_name, psis, profile=profile, crit=crit, crit_value=crit_value, exclud_mode=exclud_mode, list_consid_mode=list_consid_mode, fixed_width=fixed_width)
     te_p = np.array(te_p)
     ne_p = np.array(ne_p)
     temp = ne_p * te_p
@@ -164,32 +166,10 @@ def standard_te_pos(europed_name, profile):
     return pos-delta/2
 
 def critical_te_pos(europed_name, crit='alfven', crit_value=0.05, exclud_mode = [30,40,50], list_consid_mode = None, fixed_width = False):
-    if not fixed_width:
-        deltas = hdf5_data.get_xparam(europed_name, 'delta')
-    else:
-        deltas = hdf5_data.get_xparam(europed_name, 'betaped')
-    dict_gamma = europed_analysis_2.get_filtered_dict(europed_name, crit, list_consid_mode, fixed_width=fixed_width)
-    has_unstable, delta_crit, mode = europed_analysis_2.find_critical(deltas, deltas, dict_gamma, crit_value)
-    try:
-        delta_below = np.max([d for d in deltas if d < delta_crit])
-    except ValueError:
-        return None
-    delta_above = np.min([d for d in deltas if d > delta_crit])
-    h5_manipulation.decompress_gz(europed_name)
-    with h5py.File(europed_name + '.h5', 'r') as h5file:
-        try:
-            if not fixed_width:
-                profile_below = h5_manipulation.find_profile_with_delta_file(h5file,delta_below)
-                profile_above = h5_manipulation.find_profile_with_delta_file(h5file,delta_above)    
-            else:
-                profile_below = h5_manipulation.find_profile_with_betaped_file(h5file,delta_below)
-                profile_above = h5_manipulation.find_profile_with_betaped_file(h5file,delta_above)    
-        except useful_recurring_functions.CustomError:
-            return None
-    h5_manipulation.removedoth5(europed_name)
-    pos1 = standard_te_pos(europed_name, profile=profile_below)
-    pos2 = standard_te_pos(europed_name, profile=profile_above)
-    pos = pos1+ (pos2-pos1)*(delta_crit-delta_below)/(delta_above-delta_below)
+    p1, p2, ratio = critical_profile_number(europed_name, crit, crit_value, exclud_mode, list_consid_mode, fixed_width)
+    pos1 = standard_te_pos(europed_name, profile=p1)
+    pos2 = standard_te_pos(europed_name, profile=p2)
+    pos = pos1+ (pos2-pos1)*ratio
     return pos
 
 def te_pos(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None, fixed_width = False):
@@ -200,6 +180,16 @@ def te_pos(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode =
     else:
         print('Error in te_pos from find_pedestal_values_old.py, choose either profile or crit')
         return None
+
+
+def pepos_and_delta(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None):
+    psis = np.linspace(0.8,1.2,200)
+    fw = europed_name.startswith('fw')
+    pe_profile = create_pressure_profile(europed_name, psis, profile, crit, crit_value, exclud_mode, list_consid_mode, fixed_width=fw)
+    pe_pars = fit_mtanh(psis, pe_profile)
+    pos = pe_pars[0]
+    delta = pe_pars[1]
+    return pos, delta
 
 def te_pos_minus_hdelta(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None):
     psis = np.linspace(0.8,1.2,200)

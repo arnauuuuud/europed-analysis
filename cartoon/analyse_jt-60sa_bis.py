@@ -20,7 +20,7 @@ psis = [float(p) for p in psis]
 te = np.array([float(t) for t in te])
 ne = np.array([float(n) for n in ne])
 
-europed_name = 'jt-60sa_op2baseline_2_sauter_helsave'
+europed_name = 'jt_eta0'
 te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = None, list_consid_mode = None)
 psin_label = global_functions.psiN_label
 ne_label = global_functions.ne_label
@@ -30,7 +30,7 @@ pe_label = global_functions.pe_label
 
 fig, ax = plt.subplots()
 
-ax.plot(psis,te, color='tab:orange', label='CDBM')
+ax.plot(psis,te, color='tab:orange', label='Local')
 ax.plot(psis,te_crit, color='tab:blue', label='Europed')
 ax.set_ylabel(te_label)
 ax.set_xlabel(psin_label)
@@ -41,7 +41,7 @@ plt.show()
 
 
 fig, ax = plt.subplots()
-ax.plot(psis,ne, color='tab:orange', label='CDBM')
+ax.plot(psis,ne, color='tab:orange', label='Local')
 ax.plot(psis,ne_crit, color='tab:blue', label='Europed')
 ax.set_ylabel(ne_label)
 ax.set_xlabel(psin_label)
@@ -51,7 +51,7 @@ ax.set_ylim(bottom=0)
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(psis,1.6*ne*te, color='tab:orange', label='CDBM')
+ax.plot(psis,1.6*ne*te, color='tab:orange', label='Local')
 ax.plot(psis,1.6*te_crit*ne_crit, color='tab:blue', label='Europed')
 ax.set_ylabel(pe_label)
 ax.set_xlabel(psin_label)
@@ -96,7 +96,7 @@ Bp_aiba = [float(b) for b in Bp_aiba]
 
 
 fig, ax = plt.subplots() 
-ax.plot(psis, q_aiba, color='tab:orange', label='CDBM')
+ax.plot(psis, q_aiba, color='tab:orange', label='Local')
 ax.plot(psi, q, color='tab:blue', label='Europed')
 ax.set_ylabel(r'$q$')
 ax.legend()
@@ -106,7 +106,7 @@ ax.set_xlim(left=0, right=1)
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(psis, j_aiba, color='tab:orange', label='CDBM')
+ax.plot(psis, j_aiba, color='tab:orange', label='Local')
 ax.plot(psij, j, color='tab:blue', label='Europed')
 ax.set_ylabel(r'${j_{tot}}_{[MA\cdot m^{-2}]}$')
 ax.set_xlabel(psin_label)
@@ -116,7 +116,7 @@ ax.set_xlim(left=0, right=1)
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(psis, Bp_aiba, color='tab:orange', label='CDBM')
+ax.plot(psis, Bp_aiba, color='tab:orange', label='Local')
 ax.plot(psi, Bp_average[:301], color='tab:blue', label='Europed')
 ax.set_ylabel(r'${B_{p}}_{[T]}$')
 ax.set_xlabel(psin_label)

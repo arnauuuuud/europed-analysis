@@ -33,26 +33,34 @@ shot = 84794
 time_inputs = [45.51]
 t0 = 45.51
 time_range = [44.99997, 45.995216]
-europed_names = ['tan_eta1_rs0.022_neped2.6_betap1.35']
-color_fit = 'purple'
-crit_value = 0.1
+europed_names = ['fwi_eta1_rs0.018_neped2.67_betap1.35_w0.063']
+color_fit = 'deepskyblue'
+europed_names = ['tan_eta0_rs0.022_neped2.57_betap1.3']
+europed_names = ['tan_eta0_rs0.022_neped2.57_betap1.45_fixednesepmishka']
+crit_value = 0.05
+# europed_names = ['tan_eta0_rs0.022_neped2.57_betap1.3']
+# crit_value = 0.03
 mu_0 = 4*np.pi*10**-7
 crit = 'alfven'
-colors=['green','blue']
+colors=['red','orange','gold','green']
+exclud_mode = [1,30,40,50]
 
-dda_global = 'T037'
-uid = 'lfrassin'
-n = len(dtype_temp)
-shot = 87342
-time_inputs = [46.86]
-t0 = 46.86 
-time_range = [45.31, 48.42]
-crit = 'alfven'
-color_fit = 'orange'
-europed_names = ['fwo_eta1_rs0.04_neped2.85_betap0.95_w0.07']
-mu_0 = 4*np.pi*10**-7
-crit_value = 0.1
-colors = ['brown']
+# dda_global = 'T037'
+# uid = 'lfrassin'
+# n = len(dtype_temp)
+# shot = 87342
+# time_inputs = [46.86]
+# t0 = 46.86 
+# time_range = [45.31, 48.42]
+# crit = 'alfven'
+# color_fit = 'orange'
+# europed_names = ['tan_eta1_rs0.04_neped2.8_betap0.95']
+# # europed_names = ['tan_eta0_rs0.022_neped2.85_betap1.3']
+# mu_0 = 4*np.pi*10**-7
+# crit_value = 0.11
+# colors = ['limegreen']
+# # exclud_mode = [1,30,40,50]
+# exclud_mode = []
 
 
 # europed_names = ['tb_testmishka_betap0.85_kbm0.15_k','tb_testmishka_betap0.85_kbm0.15_ka','tb_testmishka_betap0.85_kbm0.15_kb','tb_testmishka_betap0.85_kbm0.15_kc','tb_testmishka_betap0.85_kbm0.15_kd']
@@ -159,13 +167,13 @@ def main():
     psi = np.array(psi) + 1 - psi_sep
     psi_fit = np.array(psi_fit) + 1 - psi_sep
 
-    # ax1.scatter(psi,temperature,color='white',edgecolors='black')
+    ax1.scatter(psi,temperature,color='white',edgecolors='black')
     ax1.plot(psi_fit,temperature_fit,color_fit, zorder=10)
 
-    # ax2.scatter(psi,density,color='white',edgecolors='black')
+    ax2.scatter(psi,density,color='white',edgecolors='black')
     ax2.plot(psi_fit,density_fit,color_fit, zorder=10)
 
-    # ax3.scatter(psi,1.6*density*temperature,color='white',edgecolors='black')
+    ax3.scatter(psi,1.6*density*temperature,color='white',edgecolors='black')
     ax3.plot(psi_fit,1.6*density_fit*temperature_fit,color_fit, zorder=10)
 
     psi_fit = np.array(psi_fit)
@@ -219,20 +227,20 @@ def main():
         # te,ne,dump2 = find_pedestal_values_old.create_profiles(europed_name,psis,crit='alfven')
 
         fixed_width = europed_name.startswith('fw')
-        te,ne = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value, fixed_width=fixed_width)
+        te,ne = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value, fixed_width=fixed_width, exclud_mode = exclud_mode)
 
 
-        ax1.plot(psis,te,linewidth=3, label=europed_name, color=color)
-        ax2.plot(psis, ne,linewidth=3, color=color)
-        ax3.plot(psis,1.6*ne*te,linewidth=3, color=color)
+        ax1.plot(psis,te,linewidth=1.5, label=europed_name, color=color)
+        ax2.plot(psis, ne,linewidth=1.5, color=color)
+        ax3.plot(psis,1.6*ne*te,linewidth=1.5, color=color)
 
     # ax1.text(0.05,0.05,europed_name,ha='left',va='bottom', transform=ax1.transAxes, fontsize=6)
 
     ne_sep = pedestal_values.nesep(europed_name, crit=crit, crit_value=crit_value)
     ne_ped = pedestal_values.pedestal_value_all_definition('ne', europed_name, crit=crit, crit_value=crit_value)
 
-    ax2.axhline(ne_sep)
-    ax2.axhline(ne_ped)
+    # ax2.axhline(ne_sep)
+    # ax2.axhline(ne_ped)
 
     ylabel = global_functions.get_profiles_label('te') 
     ax1.set_ylabel(ylabel, fontsize=20)
@@ -286,6 +294,19 @@ def main():
     # teped, teped_error = experimental_values.get_teped(shot, dda_global)  
     # ax1.axhline(teped, color='red')
     # ax1.axhspan(teped-teped_error,teped+teped_error, color='red', alpha=0.1)
+
+    te_pars_stability = [0.916564923,   0.000168641,  0.175359510,   0.970902795,   0.014508467,   0.349803251,   1.080884726,  -0.790751421,  -0.098976684]
+    ne_pars_stability = [2.573570444,  -0.045010339,  0.023317174,   0.991201398,   0.014834018,   0.548335008,  -0.003244445,   0.002995164,   0.002162317]
+
+    te_pars_stability = [0.585575876,   0.001238676,   0.218952723,   0.973043884,   0.017929085,   0.402505001,   0.683709442,  -0.628992276,  -0.066085070]
+    ne_pars_stability = [2.727138318,   0.018564261,   0.025430139,   1.005226231,   0.019424242,   0.909686493,   0.422774810,   0.002478595,  -0.003707925]
+
+    te_profile_hampus = old_style_profile(te_pars_stability, psis)
+    ne_profile_hampus = old_style_profile(ne_pars_stability, psis)
+
+    # ax2.plot(psis, ne_profile_hampus)
+    # ax1.plot(psis, te_profile_hampus)
+    # ax3.plot(psis, 1.6*ne_profile_hampus*te_profile_hampus)
 
     plt.show()
 
@@ -407,15 +428,7 @@ def main():
     plt.text(0,0,f'alpha_max={np.nanmax(alpha)}')
     plt.show()
 
-    # te_pars_stability = [0.916564923,   0.000168641,  0.175359510,   0.970902795,   0.014508467,   0.349803251,   1.080884726,  -0.790751421,  -0.098976684]
-    # ne_pars_stability = [2.573570444,  -0.045010339,  0.023317174,   0.991201398,   0.014834018,   0.548335008,  -0.003244445,   0.002995164,   0.002162317]
 
-    # te_profile_hampus = old_style_profile(te_pars_stability, psis)
-    # ne_profile_hampus = old_style_profile(ne_pars_stability, psis)
-
-    # # # ax2.plot(psis, ne_profile_hampus)
-    # # # ax1.plot(psis, te_profile_hampus)
-    # # # ax3.plot(psis, 1.6*ne_profile_hampus*te_profile_hampus)
 
 
 

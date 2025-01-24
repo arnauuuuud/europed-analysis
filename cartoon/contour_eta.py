@@ -144,7 +144,7 @@ def get_eta_pos(europed_name, profile):
 
 def get_adapted_profile_number(filename, profile):
     foldername = f"{os.environ['EUROPED_DIR']}hdf5"
-    os.chdir(foldername)
+    .chdir(foldername)
 
     pattern = os.path.join(filename + '*')
     filename = glob.glob(pattern)[0]

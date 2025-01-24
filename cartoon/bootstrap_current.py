@@ -18,9 +18,11 @@ helena_path += helena_name
 psi_jt = df['psi']
 jbs_jt = df['j_BS']
 
-plt.plot(psi_jt, jbs_jt, label='Local')
+fig, ax = plt.subplots()
 
-a = helena_output_file.HelenaOutput('/home/jwp9427/work/helena/output/jt-60sa0.1043_crit1')
+ax.plot(psi_jt, jbs_jt, color='tab:orange', label='CDBM')
+
+a = helena_output_file.HelenaOutput('/home/jwp9427/work/helena/output/jt-60sa0.1117_crit1')
 jbs = a.jbs
 psi = a.psi2
 bt = a.bt
@@ -35,7 +37,7 @@ bt_profile = rbphi * R0 * bt / R_average
 bt_profile = bt_profile[1:-1]
 
 jbs = jbs * 1e-6 / bt_profile
-plt.plot(psi, jbs, label='Europed - Sauter')
+ax.plot(psi, jbs, color='tab:blue', label='Europed')
 
 # hjbt = a.hjbt * 1e-6 / bt_profile
 # plt.plot(psi, hjbt, label='Test - Sauter')
@@ -122,8 +124,9 @@ plt.plot(psi, jbs, label='Europed - Sauter')
 # hjbt = a.hjbt * 1e-6 / bt_profile
 # plt.plot(psi, hjbt, label='Test - NEO')
 
-plt.xlabel(r'$\psi_N$')
-plt.ylabel(r'${J_{bs}}_{\mathrm{[MA]}}$')
+ax.set_xlim(left=0, right=1)
+ax.set_xlabel(r'$\psi_N$')
+ax.set_ylabel(r'${\left<\mathbf{j_{bs}} \cdot \mathbf{B}\right>/\left< B \right>}_{[\mathrm{MA}\cdot \mathrm{m}^{-2}]}$')
 plt.legend()
 
 plt.show()

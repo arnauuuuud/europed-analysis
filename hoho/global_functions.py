@@ -25,7 +25,7 @@ alpha_label = r'$\alpha_{\mathrm{max}}$'
 neped_wo_label = r'${n_e^{\mathrm{ped}}}$'
 teped_wo_label = r'${T_e^{\mathrm{ped}}}$'
 peped_wo_label = r'${p_e^{\mathrm{ped}}}$'
-eta_label = r'${\eta/\eta_{\mathrm{Sp}}}$'
+eta_label = r'${\eta/\eta_{\mathrm{neo}}}$'
 eta_ped_ohm_label = r'${\eta_{\mathrm{Sp}}^{\mathrm{ped}}}_{[10^{-7} \Omega \cdot \mathrm{m}]}$'
 eta_ped_label = r'${\eta_{\mathrm{Sp}}^{\mathrm{ped}}}$'# '\n' r'$_{[\Omega \cdot \mathrm{m}]}$'
 alfvengamma_label = r'$\gamma / \omega_A$'
@@ -115,9 +115,13 @@ def contour_label(param):
         'peped' : peped_label,
         'neped' : neped_label,
         'alpha' : alpha_label,
+        'alpha_average_ped' : r'$\left< \alpha \right>_{\mathrm{ped.}}$',
+        'alpha_fixed_value' : r'$\left< \alpha \right>_{0.8-1}$',
+        'alpha_fixed_value2' : r'$\left< \alpha \right>_{0.9-1}$',
         'betan' : betan_label,
         'betap' : betap_label,
         'frac' : nesepneped_label,
+        'delta' : delta_label
     }
     return label[param]
 
@@ -127,9 +131,11 @@ dict_mode_color = {
     3: 'r',   # red
     4: 'c',   # cyan
     5: 'm',   # magenta
+    6: '#008080', # teal
     7: 'y',   # yellow
+    8: '#DC143C', # crimson
     10: 'k',  # black
-    15: 'orange',
+    15: '#708090', # slate gray
     20: '#FFA07A',  # light salmon
     30: '#8A2BE2',  # blue violet
     40: '#32CD32',  # lime green
@@ -166,6 +172,37 @@ dict_shot_dda = {
     87350:'T020',
 }
 
+dict_HPLG_color_threshold = {
+    0.07: 'paleturquoise',  # Deep Sky Blue
+    0.08: 'darkturquoise',  # Teal
+    0.09: 'deepskyblue',  # Turquoise
+    0.1:  'royalblue',  # Cyan
+    0.11: 'navy',   # Blue
+}
+
+dict_HPLG_color_threshold_diamag = {
+    0.35: 'paleturquoise',  # Deep Sky Blue
+    0.45: 'darkturquoise',  # Teal
+    0.55: 'deepskyblue',  # Turquoise
+    0.65: 'royalblue',  # Cyan
+    0.75: 'navy'   # Blue
+}
+
+dict_HPHG_color_threshold = {
+    0.07: 'palegreen',  # Forest Green
+    0.08: 'chartreuse',  # Green
+    0.09: 'limegreen',  # Lime Green
+    0.1:  'seagreen',  # Mint Green
+    0.11: 'darkgreen',   # Light Spring Green
+}
+
+dict_HPHG_color_threshold_diamag = {
+    0.35: 'palegreen',  # Deep Sky Blue
+    0.45: 'chartreuse',  # Teal
+    0.55: 'limegreen',  # Turquoise
+    0.65: 'seagreen',  # Cyan
+    0.75: 'darkgreen'   # Blue
+}
 
 
 

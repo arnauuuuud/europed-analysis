@@ -24,16 +24,17 @@ def argument_parser():
     parser.add_argument("list", help = "prefix of the Europed run")
     
     parser.add_argument("-v", "--critical_value", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
+    parser.add_argument("-c", "--crit")
     parser.add_argument("-Y", "--yaxis", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
     parser.add_argument("-X", "--xaxis", help= "critical value of the growth rate, default : 0.03 for alfven, 0.25 for diamagnetic")
     parser.add_argument('-x',"--exclud_mode", type=useful_recurring_functions.parse_list_modes, help = "list of modes to exclude, comma-separated (will plot all modes except for these ones)")
 
     args = parser.parse_args()
 
-    return args.list, args.critical_value, args.yaxis, args.xaxis, args.exclud_mode
+    return args.list, args.crit, args.critical_value, args.yaxis, args.xaxis, args.exclud_mode
 
 
-def main(list_input, crit_value, ypar, xpar, exclud_mode):
+def main(list_input, crit, crit_value, ypar, xpar, exclud_mode):
     fig, ax = plt.subplots()
 
     print(exclud_mode)
@@ -48,7 +49,7 @@ def main(list_input, crit_value, ypar, xpar, exclud_mode):
         exclud_modes_good.append(temp)
     print(exclud_modes_good)
 
-    cmap = cm.plasma_r
+    cmap = cm.winter_r
 
     len_exclude_modes = []
     for b in exclud_modes_good:
@@ -64,30 +65,60 @@ def main(list_input, crit_value, ypar, xpar, exclud_mode):
     q_ped_def = 'tepos-delta'
     if ypar is None:
         ypar = 'peped'
-    crit = 'alfven'
+    # crit = 'alfven'
     consid_mode_input = None
     
     ymax = 0
 
+
+
     for color,em in zip(colors, exclud_modes_good):
         print(color)
-        ym = add_contours_to_plot.main(ax, color, list_input, crit_value, ypar, xpar, em)
+        ym = add_contours_to_plot.main(ax, [color], list_input, crit, [crit_value], ypar, xpar, em, nscan=True)
         ymax = max(ymax, ym)
 
 
 
     xlabel, ylabel = global_functions.contour_labels(xpar, ypar)
-    
+
+
+    shot = 84794
+    dda = 'T052'
+    t0 = 45.619122
+    time_range = [44.999969, 45.995216]
+
+    x, xerr = experimental_values.get_values(xpar, shot, dda, t0, time_range)
+    y, yerr = experimental_values.get_values(ypar, shot, dda, t0, time_range)
+    ax.errorbar([x], [y], xerr=[xerr], yerr=[yerr], fmt='*', color='purple', zorder=10)
+    ymax = max(ymax, (y+yerr)*1.05)
+
+    shot = 87342
+    dda = 'T037'
+    t0 = 46.869762
+    time_range = [45.312126, 48.428669]
+    x, xerr = experimental_values.get_values(xpar, shot, dda, t0, time_range)
+    y, yerr = experimental_values.get_values(ypar, shot, dda, t0, time_range)
+    ax.errorbar([x], [y], xerr=[xerr], yerr=[yerr], fmt='*', color='orange', zorder=10)
+    ymax = max(ymax, (y+yerr)*1.05)
+
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
     ax.set_ylim(bottom=0, top=ymax)
     ax.set_xlim(left=0)
+    ax.text(0.05,0.05, f'Threshold: {crit_value}', transform=ax.transAxes)
+
+
+
 
     folder = '/home/jwp9427/work/figures/contours/'
-    run_name = f'{list_input}_{crit_value}_{ypar}_{xpar}_{exclud_mode}'
+    prefix = 'A' if crit == 'alfven' else 'D'
+    run_name = f'{prefix}{list_input}_{crit_value}_{ypar}_{xpar}_{exclud_mode}'
+
+    print(f'\n    {run_name} DONE\n')
+
     plt.savefig(f'{folder}{run_name}.png')
     plt.close()
 
 if __name__ == '__main__':
-    list_input, crit_value, ypar, xpar, exclud_mode = argument_parser()
-    main(list_input, crit_value, ypar, xpar, exclud_mode)
+    list_input, crit, crit_value, ypar, xpar, exclud_mode = argument_parser()
+    main(list_input, crit, crit_value, ypar, xpar, exclud_mode)

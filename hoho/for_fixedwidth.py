@@ -3,7 +3,31 @@ import numpy as np
 import matplotlib.tri as tri
 import os
 
-def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def):
+
+def plot(ax, europed_name, color, crit_value, crit, q_ped_def, marker = 'o', open_markers=False, xy='alphapeped', exclude_modes=[]):
+    print(europed_name)
+    crit_x, crit_y = give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def, exclude_modes)
+
+    if not open_markers:
+        ax.scatter(crit_x, crit_y, marker=marker, color=color, edgecolor='k', s=50)
+    else:
+        ax.scatter(crit_x, crit_y, marker=marker, color='white', edgecolor=color, s=50)
+
+def plot_line_threshold(ax, europed_name, color, crit_values, crit, q_ped_def, xy='alphapeped', exclude_modes=[]):
+
+    x = []
+    y = []
+    for c in crit_values:
+        crit_x, crit_y = give_critx_crity(europed_name, crit, c, xy, q_ped_def, exclude_modes)
+        x.append(crit_x)
+        y.append(crit_y)
+
+    x_filt = [xi for xi in x if not xi is None]
+    y_filt = [yi for yi in y if not yi is None]
+    ax.plot(x_filt, y_filt, color=color, linewidth=0.5, zorder=-1, marker='+')
+
+
+def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def, exclude_modes=[]):
     try:
         fixed_width = europed_name.startswith('fw')
 
@@ -12,41 +36,44 @@ def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def):
 
         if xy == 'alphapeped':
             xs = hdf5_data.get_xparam(europed_name, 'alpha_helena_max')
-            print(xs)
             # ys = hdf5_data.get_xparam(europed_name, 'peped',q_ped_def)
-            crit_y_def = pedestal_values.pedestal_value_all_definition('pe', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def)
+            crit_y_def = pedestal_values.pedestal_value_all_definition('pe', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
 
         elif xy == 'nepedteped':
             # xs = hdf5_data.get_xparam(europed_name, 'neped',q_ped_def)
             # ys = hdf5_data.get_xparam(europed_name, 'teped', q_ped_def)
-            crit_x_def = pedestal_values.pedestal_value_all_definition('ne', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def)
-            crit_y_def = pedestal_values.pedestal_value_all_definition('te', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def)
+            crit_x_def = pedestal_values.pedestal_value_all_definition('ne', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
+            crit_y_def = pedestal_values.pedestal_value_all_definition('te', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
 
         elif xy == 'sepedwidth':
-            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def)
+            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
             ys = hdf5_data.get_xparam(europed_name, 'delta', q_ped_def)
 
         elif xy == 'sepedwidthbis':
-            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def)
-            crit_y_def = pedestal_values.get_fit_width(europed_name, q='pe', crit=crit, crit_value=crit_value, fixed_width=fixed_width)
+            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
+            crit_y_def = pedestal_values.get_fit_width(europed_name, q='pe', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
 
         elif xy == 'deltadelta':
-            crit_x_def = pedestal_values.get_fit_width(europed_name, q='ne', crit=crit, crit_value=crit_value, fixed_width=fixed_width)
-            crit_y_def = pedestal_values.get_fit_width(europed_name, q='te', crit=crit, crit_value=crit_value, fixed_width=fixed_width)
+            crit_x_def = pedestal_values.get_fit_width(europed_name, q='ne', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
+            crit_y_def = pedestal_values.get_fit_width(europed_name, q='te', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
 
         elif xy == 'betapbetan':
-            xs = hdf5_data.get_xparam(europed_name, 'betap',q_ped_def)
-            ys = hdf5_data.get_xparam(europed_name, 'betan',q_ped_def)
+            xs = hdf5_data.get_xparam(europed_name, 'betap')
+            ys = hdf5_data.get_xparam(europed_name, 'betan')
 
         elif xy == 'relshrelsh':
-            crit_x_def = pedestal_values.get_fit_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width)
-            crit_y_def = pedestal_values.get_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width)
+            crit_x_def = pedestal_values.get_fit_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
+            crit_y_def = pedestal_values.get_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
 
         
         deltas = hdf5_data.get_xparam(europed_name, 'betaped')  if fixed_width else hdf5_data.get_xparam(europed_name, 'delta') 
  
 
-        dict_gamma = europed_analysis_2.get_gammas(europed_name, crit='alfven', fixed_width=fixed_width)
+        dict_gamma = europed_analysis_2.get_gammas(europed_name, crit, fixed_width)
+        dict_gamma = europed_analysis_2.filter_dict(dict_gamma, exclud_mode=exclude_modes)
+        if crit == 'diamag':
+            dict_gamma = europed_analysis_2.remove_wrong_slope(dict_gamma)
+
         if crit_x_def is None:
             bo, crit_x, bi = europed_analysis_2.find_critical(xs, deltas, dict_gamma, crit_value)
         else:
@@ -59,8 +86,11 @@ def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def):
 
         return crit_x, crit_y
     except ValueError:
+        print('ValueError')
         return None, None
     except TypeError:
+        print(crit)
+        print('TypeError')
         return None, None
 
 
@@ -71,7 +101,7 @@ def plot_experimental_point(ax, xy, shotnos, colors):
 
     if xy == 'alphapeped':
         for (shotno, dda, color) in zip(shotnos, ddas, colors):
-            alpha, alpha_error = experimental_values.get_alpha(shotno, dda)
+            alpha, alpha_error = experimental_values.get_alpha_max(shotno, dda)
             peped, peped_error = experimental_values.get_peped(shotno, dda)
             ax.errorbar([alpha], [peped], xerr=[alpha_error], yerr=[peped_error], fmt='*', color=color, zorder=-1)
 

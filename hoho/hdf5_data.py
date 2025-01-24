@@ -8,7 +8,13 @@ import gzip
 import tempfile
 import glob
 import numpy as np
+import fcntl
 
+def lock_file(file):
+    fcntl.flock(file, fcntl.LOCK_EX)
+
+def unlock_file(file):
+    fcntl.flock(file, fcntl.LOCK_UN)
 
 research_dir = os.environ['EUROPED_DIR']+'hdf5'
 
@@ -40,6 +46,7 @@ def find_stored_name(europed_name):
 def read(europed_name, list_groups):
     h5_manipulation.decompress_gz(f'{europed_name}.h5.gz')
     with h5py.File(f'{europed_name}.h5', 'r') as hdf5_file:
+        # lock_file(hdf5_file)
         temp = hdf5_file
         for group in list_groups:
             temp = temp[group]
@@ -47,6 +54,8 @@ def read(europed_name, list_groups):
             res = temp[0]
         except AttributeError:
             print(list(temp.keys()))
+        # unlock_file(hdf5_file)
+
     h5_manipulation.removedoth5(f'{europed_name}.h5')
     return res
 
@@ -55,6 +64,7 @@ def read(europed_name, list_groups):
 def get(europed_name, list_groups):
     h5_manipulation.decompress_gz(europed_name)
     with h5py.File(f'{europed_name}.h5', 'r') as hdf5_file:
+        # lock_file(hdf5_file)
         temp = hdf5_file
         try:
             for group in list_groups:
@@ -64,32 +74,39 @@ def get(europed_name, list_groups):
             res = None
         except AttributeError:
             res = list(temp.keys())
+        # unlock_file(hdf5_file)
+
     h5_manipulation.removedoth5(europed_name)
     return res
 
 def get_xparam(europed_name, x_parameter):
     h5_manipulation.decompress_gz(europed_name)
     with h5py.File(f'{europed_name}.h5', 'r') as hdf5_file:
+        # lock_file(hdf5_file)
+
         try:
             n = hdf5_file['input']['steps'][0]
             list_profile = range(n)
         except KeyError:
             # n = len(hdf5_file['scan'])
             list_profile = list(hdf5_file['scan'].keys())
-            print(list_profile)
         res = np.zeros(len(list_profile))
         for i in list_profile:
             try:
                 res[int(i)] = hdf5_file['scan'][str(i)][x_parameter][0]
-                
             except KeyError:
                 pass
+            except IndexError:
+                pass
+        # unlock_file(hdf5_file)
+
     h5_manipulation.removedoth5(europed_name)
     return res
 
 def get_xparam_with_stability(europed_name, x_parameter):
     h5_manipulation.decompress_gz(europed_name)
     with h5py.File(f'{europed_name}.h5', 'r') as hdf5_file:
+        # lock_file(hdf5_file)
         try:
             n = hdf5_file['input']['steps'][0]
             list_profile = range(n)
@@ -103,6 +120,8 @@ def get_xparam_with_stability(europed_name, x_parameter):
                 res[int(i)] = hdf5_file['scan'][str(i)][x_parameter][0]
             except KeyError:
                 pass
+        # unlock_file(hdf5_file)
+
     h5_manipulation.removedoth5(europed_name)
     return res
 

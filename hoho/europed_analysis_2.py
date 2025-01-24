@@ -16,6 +16,13 @@ import math
 from hoho import useful_recurring_functions, global_functions, find_pedestal_values_old, pedestal_values
 import scipy.interpolate
 from collections import OrderedDict
+import fcntl
+
+def lock_file(file):
+    fcntl.flock(file, fcntl.LOCK_EX)
+
+def unlock_file(file):
+    fcntl.flock(file, fcntl.LOCK_UN)
 
 startup.reload(global_functions)
 startup.reload(useful_recurring_functions)
@@ -28,6 +35,8 @@ startup.reload(hdf5_data)
 def get_x_parameter(filename, x_parameter="alpha_helena_max", q_ped_def="tepos-delta"):
     if x_parameter in ['peped','teped','neped','nesep_neped']:
         nrows = hdf5_data.get(filename, ['input','steps'])
+        if nrows == None:
+            nrows = len(hdf5_data.get(filename, ['scan']))
         res = np.zeros((nrows))
         for i in range(nrows):
             res[i] = None
@@ -162,10 +171,25 @@ def give_matching_x_with_deltas(delta_input, x_input, delta_to_plot):
     return x_to_plot
 
 
+def remove_wrong_slope(dict_gamma):
+    dict_gamma_r = reverse_nested_dict(dict_gamma)
+    for n in dict_gamma_r.keys():
+        dict_gamma_mode = dict_gamma_r[n]
+        list_items = list(dict_gamma_mode.items())
+        list_items = sorted(list_items, key=lambda x: x[0])
+        for i in range(len(list_items)-1):
+            if list_items[i+1][1] < list_items[i][1]:
+                del dict_gamma_mode[list_items[i][0]]
+    dict_gamma = reverse_nested_dict(dict_gamma_r)
+    return dict_gamma
+
+
+
 def get_gammas(filename, crit="alfven", fixed_width=False):
     h5_manipulation.decompress_gz(filename)
     # Open the temporary file with h5py
     with h5py.File(filename + '.h5', 'r') as hdf5_file:
+        # lock_file(hdf5_file)
         # try:
         group_scan = hdf5_file['scan']
         list_profile = list(hdf5_file['scan'].keys())
@@ -234,6 +258,8 @@ def get_gammas(filename, crit="alfven", fixed_width=False):
         # except KeyError:
         #     print(f"{filename:>40} Unable to open 'scan'")
         #     return None
+        # unlock_file(hdf5_file)
+
     h5_manipulation.removedoth5(filename)
 
     return dict_res
@@ -338,9 +364,12 @@ def critical_value(list_gamma, crit_value, list_x_parameter):
 def get_critical_for_given_n(dict_gamma, delta_input, x_input, crit_value, n):
     dict_gamma_r = reverse_nested_dict(dict_gamma)
     subdict = dict_gamma_r[n]
-    list_gamma = list(subdict.values())
-    delta_to_plot = list(subdict.keys())
+    sorted_dict = OrderedDict(sorted(subdict.items()))
+
+    list_gamma = list(sorted_dict.values())
+    delta_to_plot = list(sorted_dict.keys())
     x_to_plot = give_matching_x_with_deltas(sorted(delta_input), sorted(x_input), delta_to_plot)
+
     if has_unstable_for_given_n(subdict, crit_value):
         if not has_below_threshold(subdict, crit_value):
             return -np.inf, np.nanmin(x_to_plot)
@@ -359,7 +388,9 @@ def find_critical(x_input, delta_input, dict_gamma, crit_value):
 
     for n in list_n:
         res_crit = get_critical_for_given_n(dict_gamma, delta_input, x_input, crit_value, n)
-        if not (res_crit is None):
+
+
+        if not (res_crit[0] is None):
             dict_crit_values[n] = res_crit
 
     if np.all(list(dict_crit_values) is None):
@@ -368,6 +399,7 @@ def find_critical(x_input, delta_input, dict_gamma, crit_value):
     list_pairs = list(dict_crit_values.items())
     list_pairs = [p for p in list_pairs if not p[1][1] is None and not np.isnan(p[1][1])]
 
+
     try:
         min_pair = min(list_pairs, key=lambda item: item[1][1])
     except ValueError:
@@ -375,7 +407,7 @@ def find_critical(x_input, delta_input, dict_gamma, crit_value):
     crit_n = min_pair[0]
     crit_x = min_pair[1][0]
 
-    if crit_x == np.nanmin(x_input):
+    if crit_x == np.nanmin(x_input):        
         return True, crit_x, -1
     elif crit_x == -np.inf:
         return True, np.nanmin(x_input), -1
@@ -384,17 +416,18 @@ def find_critical(x_input, delta_input, dict_gamma, crit_value):
 
 
 
-def critical_value_europed_name(europed_name, crit, crit_value, x_param, q_ped_def):
+def critical_value_europed_name(europed_name, crit, crit_value, x_param, q_ped_def='tepos-delta', list_consid_mode=None):
     if x_param == 'alpha':
         x_param = 'alpha_helena_max'
     elif x_param == 'frac':
-        x_param = 'nesep_neped'
-    elif x_param in ['pe','ne','te','peped','teped','neped']:
-        crit_value = pedestal_values.pedestal_value_all_definition(x_param[:2], europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def)
+        crit_value = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, list_consid_mode=list_consid_mode)
         return crit_value
-    dict_gamma = get_gammas(europed_name, crit)
+    elif x_param in ['pe','ne','te','peped','teped','neped']:
+        crit_value = pedestal_values.pedestal_value_all_definition(x_param[:2], europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, list_consid_mode=list_consid_mode)
+        return crit_value
+    dict_gamma = get_filtered_dict(europed_name, crit, consid_modes=list_consid_mode)
     deltas = hdf5_data.get_xparam(europed_name, 'delta')
-    x_parameter = hdf5_data.get_xparam_with_stability(europed_name, x_param, q_ped_def)
+    x_parameter = hdf5_data.get_xparam(europed_name, x_param)
     bim, bam, bum = find_critical(x_parameter, deltas, dict_gamma, crit_value)
     return bam
 
