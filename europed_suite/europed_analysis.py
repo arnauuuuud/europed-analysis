@@ -1,6 +1,6 @@
 import os
 import subprocess
-from hoho import startup, useful_recurring_functions, europed_hampus as europed, h5_manipulation, hdf5_data
+from europed_suite import useful_recurring_functions, h5_manipulation, hdf5_data
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 from pylib.misc import ReadFile
@@ -23,14 +23,6 @@ def lock_file(file):
 
 def unlock_file(file):
     fcntl.flock(file, fcntl.LOCK_UN)
-
-startup.reload(global_functions)
-startup.reload(useful_recurring_functions)
-startup.reload(h5_manipulation)
-startup.reload(find_pedestal_values_old)
-startup.reload(pedestal_values)
-startup.reload(hdf5_data)
-
 
 def get_x_parameter(filename, x_parameter="alpha_helena_max", q_ped_def="tepos-delta"):
     if x_parameter in ['peped','teped','neped','nesep_neped']:

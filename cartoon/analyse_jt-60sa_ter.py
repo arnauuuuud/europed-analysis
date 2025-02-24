@@ -20,31 +20,37 @@ psis = [float(p) for p in psis]
 te = np.array([float(t) for t in te])
 ne = np.array([float(n) for n in ne])
 
-europed_name = 'jt-60sa_op2baseline_mishka'
-te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
-europed_name = 'jt-60sa_op2baseline_mishka_oldEQDSK'
-te_crit2, ne_crit2 = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
+europed_name_eta0 = 'jt-60sa_op2baseline_eta0'
+europed_name_eta1 = 'jt-60sa_op2baseline_eta1'
+# europed_name_eta1b = 'jt-60sa_op2baseline_eta1_zeff1'
+te_crit_eta0, ne_crit_eta0 = pedestal_values.create_critical_profiles(europed_name_eta0, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
+te_crit_eta1, ne_crit_eta1 = pedestal_values.create_critical_profiles(europed_name_eta1, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
+te_crit_eta1b, ne_crit_eta1b = pedestal_values.create_critical_profiles(europed_name_eta1, psis, crit='alfven', crit_value=0.03, exclud_mode = [30,40,50], list_consid_mode = None)
 psin_label = global_functions.psiN_label
 ne_label = global_functions.ne_label
 te_label = global_functions.te_label
 pe_label = global_functions.pe_label
 
 
-# fig, ax = plt.subplots()
+fig, ax = plt.subplots()
 
-# ax.plot(psis,te, color='tab:orange', label='QST')
-# ax.plot(psis,te_crit, color='tab:blue', label='Europed')
-# ax.set_ylabel(te_label)
-# ax.set_xlabel(psin_label)
-# ax.legend()
-# ax.set_xlim(left=0, right=1)
-# ax.set_ylim(bottom=0)
-# plt.show()
+ax.plot(psis,te, color='tab:orange', label='QST')
+ax.plot(psis,te_crit_eta0, color='tab:blue', label=r'Europed - $\eta=0$')
+ax.plot(psis,te_crit_eta1, color='tab:red', label=r'Europed - $\eta=\eta_{\mathrm{neo}}$, $n \leq 30$')
+ax.plot(psis,te_crit_eta1b, color='purple', label=r'Europed - $\eta=\eta_{\mathrm{neo}}$, $n \leq 20$')
+ax.set_ylabel(te_label)
+ax.set_xlabel(psin_label)
+ax.legend()
+ax.set_xlim(left=0, right=1)
+ax.set_ylim(bottom=0)
+plt.show()
 
 
 fig, ax = plt.subplots()
 ax.plot(psis,ne, color='tab:orange', label='Local')
-ax.plot(psis,ne_crit, color='tab:blue', label='Europed')
+ax.plot(psis,ne_crit_eta0, color='tab:blue', label=r'Europed - $\eta=0$')
+ax.plot(psis,ne_crit_eta1, color='tab:red', label=r'Europed - $\eta=\eta_{\mathrm{neo}}$, $n \leq 30$')
+ax.plot(psis,ne_crit_eta1b, color='purple', label=r'Europed - $\eta=\eta_{\mathrm{neo}}$, $n \leq 20$')
 ax.set_ylabel(ne_label)
 ax.set_xlabel(psin_label)
 ax.legend()
@@ -54,8 +60,9 @@ plt.show()
 
 fig, ax = plt.subplots()
 ax.plot(psis,1.6*ne*te, color='tab:orange', label='QST')
-ax.plot(psis,1.6*te_crit*ne_crit, color='tab:orange', linestyle='--', label='Europed - New EQDSK')
-ax.plot(psis,1.6*te_crit2*ne_crit2, color='tab:blue', label='Europed - Previous EQDSK')
+ax.plot(psis,1.6*te_crit_eta0*ne_crit_eta0, color='tab:blue', label=r'Europed - $\eta=0$')
+ax.plot(psis,1.6*te_crit_eta1*ne_crit_eta1, color='tab:red', label=r'Europed - $\eta=\eta_{\mathrm{neo}}$, $n \leq 30$')
+ax.plot(psis,1.6*te_crit_eta1b*ne_crit_eta1b, color='purple', label=r'Europed - $\eta=\eta_{\mathrm{neo}}$, $n \leq 20$')
 
 # ax.text(0.05,0.05,r'$\beta_N(\mathrm{Europed}) \sim 2.15$, $\beta_N(\mathrm{Aiba-san}) = 2.184$' '\n' r'$\beta_p(\mathrm{Europed}) \sim 0.5$, $\beta_p(\mathrm{Aiba-san}) = 0.626$', transform=ax.transAxes)
 
@@ -68,7 +75,7 @@ plt.show()
 
 fig, ax = plt.subplots()
 ax.plot(psis,1.8*1.6*ne*te, color='tab:orange', label='QST')
-ax.plot(psis,1.8*1.6*te_crit*ne_crit, color='tab:blue', label='Europed')
+ax.plot(psis,1.8*1.6*te_crit_eta0*ne_crit_eta0, color='tab:blue', label='Europed')
 
 # ax.text(0.05,0.05,r'$\beta_N(\mathrm{Europed}) \sim 2.15$, $\beta_N(\mathrm{Aiba-san}) = 2.184$' '\n' r'$\beta_p(\mathrm{Europed}) \sim 0.5$, $\beta_p(\mathrm{Aiba-san}) = 0.626$', transform=ax.transAxes)
 
@@ -115,16 +122,8 @@ Bp_aiba = [float(b) for b in Bp_aiba]
 
 
 fig, ax = plt.subplots() 
-
-
-file_path = '/home/jwp9427/JT-60SA/profiles_refreshed.txt'
-skip_lines = list(range(34))+[35]
-df = pd.read_csv(file_path, sep=r',\s*', skiprows=skip_lines, dtype=np.float)
-q_aiba2 = np.array(df['q'])
-
-ax.plot(psis, q_aiba, color='tab:orange', label='New simulations')
-ax.plot(psis, q_aiba2, color='tab:blue', label='Previous simulations')
-# ax.plot(psi, q, color='tab:blue', label='Europed')
+ax.plot(psis, q_aiba, color='tab:orange', label='Local')
+ax.plot(psi, q, color='tab:blue', label='Europed')
 ax.set_ylabel(r'$q$')
 ax.legend()
 ax.set_xlabel(psin_label)

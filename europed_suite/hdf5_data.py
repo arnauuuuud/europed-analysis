@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import useful_recurring_functions, startup, information_hdf5, h5_manipulation
+from europed_suite import useful_recurring_functions, h5_manipulation
 import os
 import h5py
 import gzip

@@ -1,5 +1,5 @@
 import os
-from hoho import useful_recurring_functions, startup, europed_hampus as europed, europed_analysis, europed_analysis_2, h5_manipulation, hdf5_data, find_pedestal_values_old
+from europed_suite import useful_recurring_functions, europed_analysis, h5_manipulation, hdf5_data
 import matplotlib.pyplot as plt
 import h5py
 import gzip
@@ -9,9 +9,6 @@ import scipy
 import glob
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d,interp2d
-
-startup.reload(h5_manipulation)
-startup.reload(europed_analysis_2)
 
 def mtanh_offset(r, ppos, delta, h, s, offset):
     x = 2*(ppos-r)/delta
@@ -45,13 +42,48 @@ def te_pars(filename, profile):
     h5_manipulation.removedoth5(filename)
     return(te_pars)
 
+
+def eped_profile(pars, psi):
+    """
+    Takes profile parameters from europed to return profile value at psi
+    Arguments:
+        pars : iterable
+            iterable of length 8 containing the profile parameters
+        psi : float/iterable
+            if iterable returns numpy array with profile values at psi
+            else returns profile value at psi
+    """
+    def core_profile(a1, pedestal, alpha1, alpha2, x):
+        if psi > pedestal:
+            return 0.0
+        else:
+            return a1*(1-(x/pedestal)**alpha1)**alpha2
+
+    def pedestal_profile(sep, a0, pos, delta, x):
+        return sep+a0*(np.tanh(2*(1-pos)/delta)-np.tanh(2*(x-pos)/delta))
+    
+    (a0, sep, a1, pos, delta, pedestal, alpha1, alpha2) = pars
+    
+    if isinstance(psi, float) or isinstance(psi, int):
+        ped = pedestal_profile(sep, a0, pos, delta, psi)
+        if (psi > pedestal):
+            return ped
+        else:
+            core = core_profile(a1, pedestal, alpha1, alpha2, psi)
+            return ped + core
+    else:
+        prof = np.empty(len(psi))
+        for i in range(len(psi)):
+            prof[i] = eped_profile(pars, psi[i])
+        return prof
+
 def create_standard_profiles(europed_name, psis, profile):
     te_pars, ne_pars = profile_pars(europed_name, profile)
     te_profile = np.zeros(len(psis))
     ne_profile = np.zeros(len(psis))
     for i,psi in enumerate(psis):
-        te_profile[i] = europed.eped_profile(te_pars, psi)
-        ne_profile[i] = europed.eped_profile(ne_pars, psi)
+        te_profile[i] = eped_profile(te_pars, psi)
+        ne_profile[i] = eped_profile(ne_pars, psi)
     return te_profile, ne_profile
 
 def get_critical_pars(europed_name, crit='alfven', crit_value=0.03, exclud_mode = None, list_consid_mode = None, fixed_width=False):
@@ -84,10 +116,10 @@ def critical_profile_number(europed_name, crit='alfven', crit_value=0.03, exclud
         deltas = hdf5_data.get_xparam(europed_name, 'delta')
     else:
         deltas = hdf5_data.get_xparam(europed_name, 'betaped')
-    dict_gammas = europed_analysis_2.get_filtered_dict(europed_name, crit, list_consid_mode, exclud_mode, fixed_width)
+    dict_gammas = europed_analysis.get_filtered_dict(europed_name, crit, list_consid_mode, exclud_mode, fixed_width)
     if crit =='diamag':
-        dict_gammas = europed_analysis_2.remove_wrong_slope(dict_gammas)
-    has_unstable, delta_crit, mode = europed_analysis_2.find_critical(deltas, deltas, dict_gammas, crit_value)
+        dict_gammas = europed_analysis.remove_wrong_slope(dict_gammas)
+    has_unstable, delta_crit, mode = europed_analysis.find_critical(deltas, deltas, dict_gammas, crit_value)
     try:
         delta_below = np.max([d for d in deltas if d <= delta_crit])
     except ValueError:
@@ -143,15 +175,15 @@ def get_fit_width(europed_name, q, profile=None, crit=None, crit_value=0.03, exc
     elif q == 'pe':
         profile = create_pressure_profile(europed_name, psis, profile, crit, crit_value, exclud_mode, list_consid_mode, fixed_width)
 
-    params = find_pedestal_values_old.fit_mtanh_pressure(psis, profile)
+    params = fit_mtanh(psis, profile)
     return params[1]
 
 def get_fit_rs(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None, fixed_width=False):
     psis = np.linspace(0.8,1,200)
 
     te_profile, ne_profile = create_profiles(europed_name, psis, profile, crit, crit_value, exclud_mode, list_consid_mode, fixed_width)
-    params_ne = find_pedestal_values_old.fit_mtanh_pressure(psis, ne_profile)
-    params_te = find_pedestal_values_old.fit_mtanh_pressure(psis, te_profile)
+    params_ne = fit_mtanh(psis, ne_profile)
+    params_te = fit_mtanh(psis, te_profile)
     return params_ne[0]-params_te[0]
 
 def get_rs(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None, fixed_width=False):
@@ -178,7 +210,7 @@ def te_pos(europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode =
     elif (not profile is None) and (crit is None):
         return standard_te_pos(europed_name, profile)
     else:
-        print('Error in te_pos from find_pedestal_values_old.py, choose either profile or crit')
+        print('Error in te_pos from pedestal_values.py, choose either profile or crit')
         return None
 
 

@@ -44,8 +44,10 @@ def main(xy, ax):
     # for europed_name in ['tan_eta1_rs0.018_neped2.67_betap1.35']:
     #     for_fixedwidth.plot(ax, europed_name, 'red', 0.09, crit, q_ped_def, '^', False, xy=xy)  
     #     for_fixedwidth.plot(ax, europed_name, 'red', 0.1, crit, q_ped_def, '^', False, xy=xy) 
-    for europed_name in ['tan_eta1_rs0.018_neped2.67_betap1.35_kbm0116']:
-        for_fixedwidth.plot(ax, europed_name, 'blue', 0.09, crit, q_ped_def, '^', False, xy=xy)  
+    for europed_name in ['tan_eta0_rs0.018_neped2.67_betap1.35_kbm0116']:
+        for_fixedwidth.plot(ax, europed_name, 'blue', 0.03, crit, q_ped_def, '^', False, xy=xy)  
+    for europed_name in ['tan_eta0_frac0.33_neped2.67_betap1.35_kbm0116_mishka']:
+        for_fixedwidth.plot(ax, europed_name, 'red', 0.03, crit, q_ped_def, '^', False, xy=xy)  
     # for europed_name in ['tan_eta1_rs0.022_neped2.6_betap1.35']:
     #     for_fixedwidth.plot(ax, europed_2_neped2.6_betap1.35']:
     #     for_fixedwidth.plot(ax, europed_name, 'red', 0.01, crit, q_ped_def, '^', False, xy=xy)  

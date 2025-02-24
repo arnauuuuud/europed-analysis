@@ -1,7 +1,7 @@
 #!/usr/local/depot/Python-3.7/bin/python
 # /usr/local/depot/Python-3.5.1/bin/python
 
-from hoho import europed_analysis, h5_manipulation, useful_recurring_functions
+from europed_suite import europed_analysis, h5_manipulation, useful_recurring_functions
 import argparse
 import numpy as np
 import os, h5py, shutil

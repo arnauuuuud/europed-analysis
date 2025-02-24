@@ -10,7 +10,7 @@ from matplotlib.colors import Normalize
 
 
 
-europed_namess = [[f'tan_eta1_rs{rs}_neped2.57_betap{betap}' for betap in [0.55,0.7,0.85,1.0,1.15,1.3,1.45,1.6]] for rs in ['0.0',0.01,0.015,0.022,0.04]]
+europed_namess = [[f'tan_eta0_rs{rs}_neped2.57_betap{betap}' for betap in [0.55,0.7,0.85,1.0,1.15,1.3,1.45,1.6]] for rs in ['0.0',0.01,0.015,0.022,0.04]]
 
 fig, axs = plt.subplots(1,2)
 ax1 = axs[0]
@@ -40,6 +40,11 @@ for (europed_names, color) in zip(europed_namess, colors):
             ax1.scatter(betan,alpha,c=color)
             ax2.scatter(betan,nesepneped,c=color)
         except TypeError:
+            pass
+        except AttributeError:
+            pass
+
+        except FileNotFoundError:
             pass
 
 

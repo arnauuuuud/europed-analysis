@@ -53,7 +53,7 @@ def launch_and_wait(filename):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
     time.sleep(600)
-    while count_processes_running()>13:
+    while count_processes_running()>15:
         print("Not enough computing time to launch new runs", end='\r')
         time.sleep(300)  # Check every 300 second  
     print("Available computing time                                       ")

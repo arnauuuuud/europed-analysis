@@ -5,7 +5,7 @@ from pytokamak.pyTokamak.tokamak.formats import geqdsk
 import os
 
 
-run_name = 'EFIT.DATA'
+run_name = 'EFIT_kbm0076.DATA'
 
 a = geqdsk.read(f'/home/jwp9427/JT-60SA/{run_name}') 
 nbdry = a['nbdry']

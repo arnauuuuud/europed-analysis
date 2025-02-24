@@ -36,6 +36,75 @@ def get_my_fit_params(shot, dda, q):
     params_my_fit = find_pedestal_values_old.fit_mtanh_pressure(psi_fit[-number_points:], fit_profile[-number_points:])
     return params_my_fit
 
+def get_pe_fit_profile(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,density_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='NEF3')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    fit_profile = 1.6 * density_fit * temperature_fit
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi_fit = np.array(psi_fit) + 1 - psi_sep 
+    return psi_fit, fit_profile
+
+def get_pe_points(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,temperature,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TE')
+    ihdat,iwdat,density,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='NE')
+    ihdat,iwdat,psi,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIE')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    pressure = 1.6 * density * temperature
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi = np.array(psi) + 1 - psi_sep 
+    return psi, pressure
+
+def get_ne_fit_profile(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,density_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='NEF3')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi_fit = np.array(psi_fit) + 1 - psi_sep 
+    return psi_fit, density_fit
+
+def get_ne_points(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,density,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='NE')
+    ihdat,iwdat,psi,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIE')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi = np.array(psi) + 1 - psi_sep 
+    return psi, density
+
+def get_te_fit_profile(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi_fit = np.array(psi_fit) + 1 - psi_sep 
+    return psi_fit, temperature_fit
+
+def get_te_points(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,temperature,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TE')
+    ihdat,iwdat,psi,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIE')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi = np.array(psi) + 1 - psi_sep 
+    return psi, temperature
+
+def get_max_pressure_gradient(shot, dda):
+    psi, pe = get_pressure_fit_profile(shot, dda)
+    gradp = np.gradient(pe, psi)
+    return np.nanmax(gradp)
 
 def get_my_fit_width(shot, dda, q):
     params_my_fit = get_my_fit_params(shot, dda, q)

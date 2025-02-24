@@ -10,7 +10,7 @@ from pytokamak.pyTokamak.tokamak.formats import geqdsk
 
 fig, axs = plt.subplots(3,2, sharex=True)
 
-file_path = '/home/jwp9427/JT-60SA/profiles_refreshed.txt'
+file_path = '/home/jwp9427/JT-60SA/profiles_kbm0076.txt'
 skip_lines = list(range(34))+[35]
 df = pd.read_csv(file_path, sep=r',\s*', skiprows=skip_lines, dtype=np.float)
 
@@ -26,17 +26,17 @@ axs[2,0].plot(psis,1.6*ne*te, label='Local', color='tab:orange')
 
 
 
-europed_name = 'jt_mishka_kbm0.076'
-te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = None, list_consid_mode = None)
+europed_name = 'jt-60sa_op2baseline_2_eta0_Zeff1.8'
+te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
 axs[0,0].plot(psis,te_crit, color='tab:blue')
 axs[1,0].plot(psis,ne_crit, color='tab:blue')
-axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed', color='tab:blue')
+axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - newEQDSK', color='tab:blue')
 
-europed_name_bis = 'jt_mishka_kbm0.076_bsfrac0.8'
-te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name_bis, psis, crit='alfven', crit_value=0.03, exclud_mode = None, list_consid_mode = None)
+europed_name_bis = 'jt-60sa_op2baseline_mishka_oldEQDSK'
+te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name_bis, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
 axs[0,0].plot(psis,te_crit, color='tab:red')
 axs[1,0].plot(psis,ne_crit, color='tab:red')
-axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - Sauter', color='tab:red')
+axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - oldEQDSK', color='tab:red')
 
 
 psin_label = global_functions.psiN_label
@@ -78,26 +78,26 @@ try:
 except TypeError:
     pass
 
-try:
-    psi = critical_helena_profile.get_profile_eliteinp('Psi',europed_name, exclud_mode=[40,50])
-    psi = psi/psi[-1]
-    Bp = critical_helena_profile.get_profile_eliteinp('Bp',europed_name, exclud_mode=[40,50])
+# try:
+#     psi = critical_helena_profile.get_profile_eliteinp('Psi',europed_name, exclud_mode=[40,50])
+#     psi = psi/psi[-1]
+#     Bp = critical_helena_profile.get_profile_eliteinp('Bp',europed_name, exclud_mode=[40,50])
 
-    Bp = np.array(Bp)
-    Bp_reshaped = Bp.reshape(len(Bp)//301,301)
-    Bp_average = np.mean(Bp_reshaped, axis=0)
-    axs[2,1].plot(psi, Bp_average, color='tab:blue')
-    psi = critical_helena_profile.get_profile_eliteinp('Psi',europed_name_bis, exclud_mode=[40,50])
-    psi = psi/psi[-1]
-    Bp = critical_helena_profile.get_profile_eliteinp('Bp',europed_name_bis, exclud_mode=[40,50])
+#     Bp = np.array(Bp)
+#     Bp_reshaped = Bp.reshape(len(Bp)//301,301)
+#     Bp_average = np.mean(Bp_reshaped, axis=0)
+#     axs[2,1].plot(psi, Bp_average, color='tab:blue')
+#     psi = critical_helena_profile.get_profile_eliteinp('Psi',europed_name_bis, exclud_mode=[40,50])
+#     psi = psi/psi[-1]
+#     Bp = critical_helena_profile.get_profile_eliteinp('Bp',europed_name_bis, exclud_mode=[40,50])
 
-    Bp = np.array(Bp)
-    Bp_reshaped = Bp.reshape(len(Bp)//301,301)
-    Bp_average = np.mean(Bp_reshaped, axis=0)
-    axs[2,1].plot(psi, Bp_average, color='tab:red')
+#     Bp = np.array(Bp)
+#     Bp_reshaped = Bp.reshape(len(Bp)//301,301)
+#     Bp_average = np.mean(Bp_reshaped, axis=0)
+#     axs[2,1].plot(psi, Bp_average, color='tab:red')
 
-except TypeError:
-    pass
+# except TypeError:
+#     pass
 
 # try:
 #     psij, j = critical_helena_profile.get_profile_psij(europed_name_bis, exclud_mode=[40,50])
@@ -154,38 +154,45 @@ length = np.array(df['len'])
 
 
 
-a = helena_output_file.HelenaOutput('/home/jwp9427/work/helena/output/jt-60sa0.1241_crit1')
-s_jz = a.s_jz
-psi_jz = s_jz**2
-jz = a.jz
-
-jbs = a.jbs
-psi_bs = a.psi2
-bt = a.bt
-rbphi = a.rbphi
-b = helena_read.read_eliteinp('jt-60sa0.1240_crit1')
-R = b['R'].reshape(301, len(b['R'])//301)
-R_average = np.mean(R, axis=1)
-rbphi = np.array(rbphi)
-R0 = a.rmag
-
-bt_profile = rbphi * R0 * bt / R_average
-bt_profile = bt_profile[1:-1]
-
-# jbs = jbs * 1e-6 / bt_profile
-# j = j * np.mean(bt_profile)/bt_profile
-# axs[1,1].plot(psij, j, color='tab:gray')
+file_path = '/home/jwp9427/JT-60SA/profiles_refreshed.txt'
+skip_lines = list(range(34))+[35]
+df = pd.read_csv(file_path, sep=r',\s*', skiprows=skip_lines, dtype=np.float)
+q_aiba2 = np.array(df['q'])
 
 
+# a = helena_output_file.HelenaOutput('/home/jwp9427/work/helena/output/jt-60sa0.1241_crit1')
+# s_jz = a.s_jz
+# psi_jz = s_jz**2
+# jz = a.jz
 
+# jbs = a.jbs
+# psi_bs = a.psi2
+# bt = a.bt
+# rbphi = a.rbphi
+# b = helena_read.read_eliteinp('jt-60sa0.1240_crit1')
+# R = b['R'].reshape(301, len(b['R'])//301)
+# R_average = np.mean(R, axis=1)
+# rbphi = np.array(rbphi)
+# R0 = a.rmag
+
+# bt_profile = rbphi * R0 * bt / R_average
+# bt_profile = bt_profile[1:-1]
+
+# # jbs = jbs * 1e-6 / bt_profile
+# # j = j * np.mean(bt_profile)/bt_profile
+# # axs[1,1].plot(psij, j, color='tab:gray')
+
+
+
+axs[0,1].plot(psis, q_aiba2, linestyle=':', color='tab:orange')
 axs[0,1].plot(psis, q_aiba, color='tab:orange')
-# axs[1,1].plot(psis, j_aiba, color='tab:orange')
-# axs[1,1].plot(psi_jz, jz, color='tab:blue', label='Europed')
-# # axs[1,1].plot(psis, j_aiba-j_aibaBS, color='tab:orange', linestyle='--')
-# axs[1,1].plot(psis, j_aibaBS, color='tab:green', linestyle='dotted')
-# axs[1,1].plot(psi_bs, jbs, color='tab:purple', linestyle='dotted')
-# # axs[1,1].plot(psis, j_aibaBS, color='tab:orange', linestyle='dashed')
-axs[2,1].plot(psis, Bp_aiba, color='tab:orange')
+# # axs[1,1].plot(psis, j_aiba, color='tab:orange')
+# # axs[1,1].plot(psi_jz, jz, color='tab:blue', label='Europed')
+# # # axs[1,1].plot(psis, j_aiba-j_aibaBS, color='tab:orange', linestyle='--')
+# # axs[1,1].plot(psis, j_aibaBS, color='tab:green', linestyle='dotted')
+# # axs[1,1].plot(psi_bs, jbs, color='tab:purple', linestyle='dotted')
+# # # axs[1,1].plot(psis, j_aibaBS, color='tab:orange', linestyle='dashed')
+# axs[2,1].plot(psis, Bp_aiba, color='tab:orange')
 
 axs[0,1].set_ylabel(r'$q$')
 # axs[1,1].set_ylabel(r'${j_{tot}}_{[MA\cdot m^{-2}]}$')
