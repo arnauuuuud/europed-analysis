@@ -84,11 +84,13 @@ ax.plot(list_x, list_y, marker='o', color=color_europed_n20, linestyle=linestyle
 
 alpha, alpha_error = experimental_values.get_alpha_max(shot, dda)
 
-ax.axhspan(alpha-alpha_error, alpha+alpha_error, color=color_exp, alpha=0.2)
 ax.axhline(alpha, color = color_exp)
 (r,g,b) = mcolors.to_rgb(color_exp)
 backgroundcolor = (r, g, b, 0.2)
-ax.text(0.5, alpha, r'$\alpha_{\mathrm{max}}(\mathrm{exp})$', ha='center', va='center', color=color_exp, backgroundcolor=backgroundcolor)
+ax.text(0.5, alpha, r'$\alpha_{\mathrm{max}}(\mathrm{exp})$', ha='center', va='center', color=color_exp,
+         bbox=dict(facecolor='white', edgecolor='none', pad=3))
+
+ax.axhspan(alpha-alpha_error, alpha+alpha_error, color=color_exp, alpha=0.2, zorder=100)
 
 ax.axvline(1, color='black')
 ax.text(1,0.5,r'$\eta=\eta_{\mathrm{neo}}$', rotation=90, backgroundcolor='white', ha='center', va='bottom')

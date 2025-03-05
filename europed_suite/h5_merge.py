@@ -38,7 +38,7 @@ def copy_original_file(original_name, extension_name, option):
     new_name = new_name_for_original_file(original_name, extension_name, option)
     if os.path.exists(foldername+new_name):
         raise useful_recurring_functions.CustomError('the new name for the original file already exists')
-    h5_manipulation.decompress_gz(original_name)
+    zipped = h5_manipulation.decompress_gz(original_name)
     shutil.copy(original_name +'.h5', new_name +'.h5')
     h5_manipulation.compress_to_gz(new_name)
     print(f'    New name for the old version of the file: {new_name}')
@@ -108,9 +108,6 @@ def merge(original_name, extension_name, option, modes, deltas_to_put, is_fixed_
 
             # if delta is not in the list of interesting deltas, pass
             if all(abs(delta_extension-delta)>0.0001 for delta in deltas_to_put):
-                print(delta_extension)
-                print(deltas_to_put)
-                print('yessss')
                 continue
 
             # if delta is already in the original file
@@ -119,12 +116,10 @@ def merge(original_name, extension_name, option, modes, deltas_to_put, is_fixed_
                     if option == 'replace':
                         merge_single_profile(original_file, extension_file, modes, delta_extension, is_fixed_width, mishka)
                 except useful_recurring_functions.CustomError:
-                    print('letsadddd')
                     letsadd = True
 
             # if delta should be added to the original file
             else:
-                print('add')
                 letsadd = True
             
             if letsadd:
@@ -133,19 +128,7 @@ def merge(original_name, extension_name, option, modes, deltas_to_put, is_fixed_
                 count_new_profile += 1
                 original_file['scan'].create_group(name_new_profile)
                 for key in new_group.keys():
-                    new_group.copy(key, original_file['scan'][name_new_profile])
-                    # try:
-                    #     del original_file['scan'][name_new_profile][stability_code]
-                    # except KeyError:
-                    #     print('No CASTOR results in the new file')
-
-                    # original_file['scan'][name_new_profile].create_group(stability_code)
-                    # new_group_castor = new_group[stability_code]
-                    # for mode in new_group_castor.keys():
-                    #     if int(mode) in modes:
-                    #         new_group_castor.copy(mode, original_file['scan'][name_new_profile][stability_code])
-
-                    
+                    new_group.copy(key, original_file['scan'][name_new_profile])                    
 
                 new_delta_in_original.append(delta_extension)
 
@@ -182,9 +165,10 @@ def merge(original_name, extension_name, option, modes, deltas_to_put, is_fixed_
 
 def merge_files(original_name, extension_name, option, modes, deltas, is_fixed_width, mishka):
     copy_original_file(original_name, extension_name, option)
-    h5_manipulation.decompress_gz(extension_name)
+    zipped = h5_manipulation.decompress_gz(extension_name)
     merge(original_name, extension_name, option, modes, deltas, is_fixed_width, mishka)
-    h5_manipulation.removedoth5(extension_name)
+    if zipped:
+        h5_manipulation.removedoth5(extension_name)
     h5_manipulation.compress_to_gz(original_name)
 
 

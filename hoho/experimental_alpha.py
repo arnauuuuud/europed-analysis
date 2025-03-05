@@ -58,6 +58,7 @@ def profile(shot, dda):
 
 
     corr=1+(5-zeff_0)/4
+    corr = 2
     dpdpsi_1 = corr*dpdpsi_1
 
 
@@ -68,7 +69,7 @@ def profile(shot, dda):
 
     psi_N_array = []
     V_array = []
-    for t in np.linspace(t1,t2,100):
+    for t in np.linspace(t1,t2,10):
         psi_N, V = ra_flush_v3(shot, t, R, Z)
         psi_N_array.append(psi_N)
         V_array.append(V)
@@ -77,6 +78,8 @@ def profile(shot, dda):
     V_array = np.array(V_array)
     psi_N = np.nanmean(psi_N_array, axis=0)
     V = np.nanmean(V_array, axis=0)
+
+    print(np.mean(V))
 
     interpolator = interp1d(psi_fit, dpdpsi_1, bounds_error=False)
     dpdpsi_alpha = []
@@ -95,4 +98,4 @@ def profile(shot, dda):
 
 def alpha_max(shot, dda):
     psi, alpha = profile(shot, dda)
-    return np.max(alpha)
+    return np.nanmax(alpha)

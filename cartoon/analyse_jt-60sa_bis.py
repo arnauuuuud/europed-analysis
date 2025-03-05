@@ -20,30 +20,28 @@ psis = [float(p) for p in psis]
 te = np.array([float(t) for t in te])
 ne = np.array([float(n) for n in ne])
 
-europed_name = 'jt-60sa_op2baseline_mishka'
+europed_name = 'jt-60sa_op2baseline_2_mishka'
 te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
-europed_name = 'jt-60sa_op2baseline_mishka_oldEQDSK'
-te_crit2, ne_crit2 = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
 psin_label = global_functions.psiN_label
 ne_label = global_functions.ne_label
 te_label = global_functions.te_label
 pe_label = global_functions.pe_label
 
 
-# fig, ax = plt.subplots()
+fig, ax = plt.subplots()
 
-# ax.plot(psis,te, color='tab:orange', label='QST')
-# ax.plot(psis,te_crit, color='tab:blue', label='Europed')
-# ax.set_ylabel(te_label)
-# ax.set_xlabel(psin_label)
-# ax.legend()
-# ax.set_xlim(left=0, right=1)
-# ax.set_ylim(bottom=0)
-# plt.show()
+ax.plot(psis,te, color='tab:orange', label='GOTRESS - EPED')
+ax.plot(psis,te_crit, color='tab:blue', label='Europed')
+ax.set_ylabel(te_label)
+ax.set_xlabel(psin_label)
+ax.legend()
+ax.set_xlim(left=0, right=1)
+ax.set_ylim(bottom=0)
+plt.show()
 
 
 fig, ax = plt.subplots()
-ax.plot(psis,ne, color='tab:orange', label='Local')
+ax.plot(psis,ne, color='tab:orange', label='GOTRESS - EPED')
 ax.plot(psis,ne_crit, color='tab:blue', label='Europed')
 ax.set_ylabel(ne_label)
 ax.set_xlabel(psin_label)
@@ -53,32 +51,14 @@ ax.set_ylim(bottom=0)
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(psis,1.6*ne*te, color='tab:orange', label='QST')
-ax.plot(psis,1.6*te_crit*ne_crit, color='tab:orange', linestyle='--', label='Europed - New EQDSK')
-ax.plot(psis,1.6*te_crit2*ne_crit2, color='tab:blue', label='Europed - Previous EQDSK')
-
-# ax.text(0.05,0.05,r'$\beta_N(\mathrm{Europed}) \sim 2.15$, $\beta_N(\mathrm{Aiba-san}) = 2.184$' '\n' r'$\beta_p(\mathrm{Europed}) \sim 0.5$, $\beta_p(\mathrm{Aiba-san}) = 0.626$', transform=ax.transAxes)
-
+ax.plot(psis,1.6*ne*te, color='tab:orange', label='GOTRESS - EPED')
+ax.plot(psis,1.6*te_crit*ne_crit, color='tab:blue',  label='Europed')
 ax.set_ylabel(pe_label)
 ax.set_xlabel(psin_label)
 ax.legend()
 ax.set_xlim(left=0.8, right=1)
 ax.set_ylim(bottom=0, top=30)
 plt.show()
-
-fig, ax = plt.subplots()
-ax.plot(psis,1.8*1.6*ne*te, color='tab:orange', label='QST')
-ax.plot(psis,1.8*1.6*te_crit*ne_crit, color='tab:blue', label='Europed')
-
-# ax.text(0.05,0.05,r'$\beta_N(\mathrm{Europed}) \sim 2.15$, $\beta_N(\mathrm{Aiba-san}) = 2.184$' '\n' r'$\beta_p(\mathrm{Europed}) \sim 0.5$, $\beta_p(\mathrm{Aiba-san}) = 0.626$', transform=ax.transAxes)
-
-ax.set_ylabel(r'$p_{[\mathrm{kPa}]}$')
-ax.set_xlabel(psin_label)
-ax.legend()
-ax.set_xlim(left=0.8, right=1)
-ax.set_ylim(bottom=0, top=30)
-plt.show()
-
 
 
 try:
@@ -117,14 +97,9 @@ Bp_aiba = [float(b) for b in Bp_aiba]
 fig, ax = plt.subplots() 
 
 
-file_path = '/home/jwp9427/JT-60SA/profiles_refreshed.txt'
-skip_lines = list(range(34))+[35]
-df = pd.read_csv(file_path, sep=r',\s*', skiprows=skip_lines, dtype=np.float)
-q_aiba2 = np.array(df['q'])
 
-ax.plot(psis, q_aiba, color='tab:orange', label='New simulations')
-ax.plot(psis, q_aiba2, color='tab:blue', label='Previous simulations')
-# ax.plot(psi, q, color='tab:blue', label='Europed')
+ax.plot(psis, q_aiba, color='tab:orange', label='GOTRESS - EPED')
+ax.plot(psi, q, color='tab:blue', label='Europed')
 ax.set_ylabel(r'$q$')
 ax.legend()
 ax.set_xlabel(psin_label)
@@ -133,7 +108,7 @@ ax.set_xlim(left=0, right=1)
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(psis, j_aiba, color='tab:orange', label='Local')
+ax.plot(psis, j_aiba, color='tab:orange', label='GOTRESS - EPED')
 ax.plot(psij, j, color='tab:blue', label='Europed')
 ax.set_ylabel(r'${j_{tot}}_{[MA\cdot m^{-2}]}$')
 ax.set_xlabel(psin_label)
@@ -143,7 +118,7 @@ ax.set_xlim(left=0, right=1)
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(psis, Bp_aiba, color='tab:orange', label='Local')
+ax.plot(psis, Bp_aiba, color='tab:orange', label='GOTRESS - EPED')
 ax.plot(psi, Bp_average[:301], color='tab:blue', label='Europed')
 ax.set_ylabel(r'${B_{p}}_{[T]}$')
 ax.set_xlabel(psin_label)

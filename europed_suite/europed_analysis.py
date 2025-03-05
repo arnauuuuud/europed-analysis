@@ -3,7 +3,7 @@ import subprocess
 from europed_suite import useful_recurring_functions, h5_manipulation, hdf5_data
 import matplotlib.pyplot as plt
 from matplotlib import ticker
-from pylib.misc import ReadFile
+from jetlib.misc import ReadFile
 import h5py
 import gzip
 import tempfile
@@ -13,7 +13,6 @@ from matplotlib.patches import Patch
 import glob
 import re
 import math
-from hoho import useful_recurring_functions, global_functions, find_pedestal_values_old, pedestal_values
 import scipy.interpolate
 from collections import OrderedDict
 import fcntl
@@ -181,7 +180,7 @@ def remove_wrong_slope(dict_gamma):
 
 
 def get_gammas(filename, crit="alfven", fixed_width=False):
-    h5_manipulation.decompress_gz(filename)
+    zipped = h5_manipulation.decompress_gz(filename)
     # Open the temporary file with h5py
     with h5py.File(filename + '.h5', 'r') as hdf5_file:
         # lock_file(hdf5_file)
@@ -256,7 +255,8 @@ def get_gammas(filename, crit="alfven", fixed_width=False):
         #     return None
         # unlock_file(hdf5_file)
 
-    h5_manipulation.removedoth5(filename)
+    if zipped:
+        h5_manipulation.removedoth5(filename)
 
     return dict_res
 

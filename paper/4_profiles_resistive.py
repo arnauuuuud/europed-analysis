@@ -22,6 +22,7 @@ fontsizetext = constants.fontsizetext
 crit = 'alfven'
 crit_value = 0.1
 fixed_width = False
+frac_uncertainty = 0.1
 exclud_mode = []
 color_exp = plot_canvas.colorHPLG
 color_europed_eta0 = plot_canvas.color_eta0
@@ -46,6 +47,12 @@ axs[0].plot(psis, ne, color=color_europed_eta0)
 axs[1].plot(psis, te, color=color_europed_eta0)
 axs[2].plot(psis, pe, color=color_europed_eta0)
 
+te_m,ne_m = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value*(1-frac_uncertainty), fixed_width=fixed_width, exclud_mode = exclud_mode)
+pe_m = 1.6*ne_m*te_m
+te_p,ne_p = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value*(1+frac_uncertainty), fixed_width=fixed_width, exclud_mode = exclud_mode)
+pe_p = 1.6*ne_p*te_p
+axs[2].fill_between(psis, pe_m, pe_p, color=color_europed_eta0, alpha=0.2)
+
 
 europed_name = 'tan_eta1_rs0.022_neped2.57_betap1.3'
 te,ne = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value, fixed_width=fixed_width, exclud_mode = exclud_mode)
@@ -54,6 +61,12 @@ axs[0].plot(psis, ne, color=color_europed_eta1, linestyle=linestyle_n50)
 axs[1].plot(psis, te, color=color_europed_eta1, linestyle=linestyle_n50)
 axs[2].plot(psis, pe, color=color_europed_eta1, linestyle=linestyle_n50)
 
+te_m,ne_m = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value*(1-frac_uncertainty), fixed_width=fixed_width, exclud_mode = exclud_mode)
+pe_m = 1.6*ne_m*te_m
+te_p,ne_p = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value*(1+frac_uncertainty), fixed_width=fixed_width, exclud_mode = exclud_mode)
+pe_p = 1.6*ne_p*te_p
+axs[2].fill_between(psis, pe_m, pe_p, color=color_europed_eta1, alpha=0.2)
+
 europed_name = 'tan_eta1_rs0.022_neped2.57_betap1.3'
 exclud_mode = [30,40,50]
 te,ne = pedestal_values.create_profiles(europed_name,psis,crit=crit,crit_value=crit_value, fixed_width=fixed_width, exclud_mode = exclud_mode)
@@ -61,8 +74,6 @@ pe = 1.6*ne*te
 axs[0].plot(psis, ne, color=color_europed_eta1, linestyle=linestyle_n20)
 axs[1].plot(psis, te, color=color_europed_eta1, linestyle=linestyle_n20)
 axs[2].plot(psis, pe, color=color_europed_eta1, linestyle=linestyle_n20)
-
-
 
 
 

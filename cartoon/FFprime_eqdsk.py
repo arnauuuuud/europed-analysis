@@ -9,7 +9,7 @@ from scipy.interpolate import splrep, splev
 from pytokamak.pyTokamak.tokamak.formats import geqdsk
 
 
-run_name = 'EFIT.DATA'
+run_name = 'EFIT_kbm0076.DATA'
 eqdsk1 = geqdsk.read(f'/home/jwp9427/JT-60SA/{run_name}') 
 
 f_eqdsk1 = eqdsk1['fpol']
@@ -21,8 +21,7 @@ index0_1 = np.nanargmin(np.abs(z))
 ffprime1 = f_eqdsk1 * np.gradient(f_eqdsk1, psi_eqdsk1[:,0])
 ffp_1 = eqdsk1['ffprime']
 
-run_name = 'jt-60sa0.1043_crit1'
-run_name = 'jt-60sa0.1158_crit1'
+run_name = 'jt-60sa0.1532_crit1'
 
 eqdsk2 = geqdsk.read(f'/home/jwp9427/work/chease/eqdsk/{run_name}') 
 # eqdsk2 = geqdsk.read(f'/home/jwp9427/work/helena/geqdsk/{run_name}') 

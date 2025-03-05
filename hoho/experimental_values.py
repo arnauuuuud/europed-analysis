@@ -1,5 +1,5 @@
 import os
-from hoho import useful_recurring_functions, startup, europed_hampus as europed, europed_analysis, europed_analysis_2, h5_manipulation, hdf5_data, find_pedestal_values_old, pedestal_values
+from hoho import useful_recurring_functions, startup, europed_hampus as europed, europed_analysis, europed_analysis_2, h5_manipulation, hdf5_data, find_pedestal_values_old, pedestal_values,alpha_operational_point
 import matplotlib.pyplot as plt
 import h5py
 import gzip
@@ -11,6 +11,7 @@ from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d,interp2d
 from ppf import ppfget, ppfuid
 from hoho.ra_flush_v3 import ra_flush_v3
+from hoho.ra_flush_v3_fast import ra_flush_v3_fast
 
 mu_0 = 4*np.pi*10**-7
 
@@ -218,10 +219,6 @@ dict_known_alpha = {
 }
 
 
-# dict_known_alpha = {
-#     87342: 2.249000,
-#     84794: 3.838000
-# }
 
 def get_alpha_profile(shot, dda):
     ppfuid('lfrassin')
@@ -260,6 +257,7 @@ def get_alpha_profile(shot, dda):
     zeff_0 = np.nanmean(zeff[timez_filtered])
 
     dpdpsi_1 = np.gradient(1.6*density_fit*temperature_fit, psi_fit)
+    zeff_0 = 1.3
     corr=1+(5-zeff_0)/4
     dpdpsi_1 = corr*dpdpsi_1
 
@@ -292,6 +290,9 @@ def get_alpha_profile(shot, dda):
 
     alpha = -2 * dVdpsi / (2*np.pi)**2 * np.sqrt(V / (2*np.pi**2*rgeo_0)) * mu_0 * dpdpsi_alpha / (psi1-psi0)**2
 
+    # out = alpha_operational_point.alpha_operational_point(shot=shot, dda=dda)
+    # psi_N = out['psi']
+    # alpha = out['alpha']
     return psi_N, alpha
 
 
@@ -312,11 +313,17 @@ def get_alpha_max(shot, dda):
     gradp = peped/wp
     gradp_error = np.sqrt((peped_error/peped)**2 + (wp_error/wp)**2) * gradp
     
+    # out = alpha_operational_point.alpha_operational_point(shot=shot, dda=dda)
+    # alpha_max = out['alphamax']
+    # return alpha_max,0
+
+
     if shot in list(dict_known_alpha.keys()):
         alpha_max = dict_known_alpha[shot]
     else:
         psi_N, alpha = get_alpha_profile(shot, dda)
-        alpha_max = np.nanmax(alpha)
+        ind = np.where(psi_N>0.8)
+        alpha_max = np.nanmax(alpha[ind])
 
     alpha_error = alpha_max * gradp_error / gradp
     return alpha_max, alpha_error

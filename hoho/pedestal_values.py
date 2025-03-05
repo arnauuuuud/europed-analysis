@@ -201,6 +201,21 @@ def te_pos_minus_hdelta(europed_name, profile=None, crit=None, crit_value=0.03, 
     return pos-delta/2
 
 
+def tepos_mhdelta(psi, te_profile):
+    te_pars = fit_mtanh(psi, te_profile)
+    pos = te_pars[0]
+    delta = te_pars[1]
+    return pos-delta/2   
+
+
+def pedestal_value_tepos_mhdelta(psi, profile, te_profile):
+    pos = tepos_mhdelta(psi, te_profile)
+    spline = interp1d(psi, profile)
+    ped_value = spline(pos)
+    return ped_value
+
+
+
 def pedestal_value(q, europed_name, profile=None, crit=None, crit_value=0.03, exclud_mode = None, list_consid_mode = None):
     psis = np.linspace(0.85,1,200)
     fw = europed_name.startswith('fw')

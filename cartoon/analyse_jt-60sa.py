@@ -26,17 +26,17 @@ axs[2,0].plot(psis,1.6*ne*te, label='Local', color='tab:orange')
 
 
 
-europed_name = 'jt-60sa_op2baseline_2_eta0_Zeff1.8'
+europed_name = 'jt-60sa_op2baseline_2_mishka'
 te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
 axs[0,0].plot(psis,te_crit, color='tab:blue')
 axs[1,0].plot(psis,ne_crit, color='tab:blue')
-axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - newEQDSK', color='tab:blue')
+axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - MISHKA', color='tab:blue')
 
-europed_name_bis = 'jt-60sa_op2baseline_mishka_oldEQDSK'
+europed_name_bis = 'jt-60sa_op2baseline_2_eta0_Zeff1.8'
 te_crit, ne_crit = pedestal_values.create_critical_profiles(europed_name_bis, psis, crit='alfven', crit_value=0.03, exclud_mode = [40,50], list_consid_mode = None)
 axs[0,0].plot(psis,te_crit, color='tab:red')
 axs[1,0].plot(psis,ne_crit, color='tab:red')
-axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - oldEQDSK', color='tab:red')
+axs[2,0].plot(psis,1.6*te_crit*ne_crit, label='Europed - CASTOR', color='tab:red')
 
 
 psin_label = global_functions.psiN_label
@@ -71,10 +71,10 @@ try:
     psi = psi/psi[-1]
     q = critical_helena_profile.get_profile_eliteinp('q',europed_name, exclud_mode=[40,50])
     axs[0,1].plot(psi, q, color='tab:blue')
-    psi = critical_helena_profile.get_profile_eliteinp('Psi',europed_name_bis, exclud_mode=[40,50])
-    psi = psi/psi[-1]
-    q = critical_helena_profile.get_profile_eliteinp('q',europed_name_bis, exclud_mode=[40,50])
-    axs[0,1].plot(psi, q, color='tab:red')
+    # psi = critical_helena_profile.get_profile_eliteinp('Psi',europed_name_bis, exclud_mode=[40,50])
+    # psi = psi/psi[-1]
+    # q = critical_helena_profile.get_profile_eliteinp('q',europed_name_bis, exclud_mode=[40,50])
+    # axs[0,1].plot(psi, q, color='tab:red')
 except TypeError:
     pass
 

@@ -22,7 +22,7 @@ colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'gold', 'orange', 'purple',
 
 
 
-def run(europed_names, y_parameter, crit, crit_values, list_consid_mode, shown, showlegend, whichxparameter, xlabel, is_frac):
+def run(europed_names, y_parameter, crit, crit_values, list_consid_mode, shown, showlegend, whichxparameter, xlabel, is_frac, nominus1):
 
     startup.reload(global_functions)
     startup.reload(useful_recurring_functions)
@@ -150,6 +150,15 @@ def run(europed_names, y_parameter, crit, crit_values, list_consid_mode, shown, 
                     x_list_plot = x_lists[i][~nan_indices]
                 y_list = y_list[~nan_indices]
                 n_list = n_list[~nan_indices]
+
+                if nominus1:
+                    nan_indices = np.isnan(n_list)
+                    minus1_indices = (n_list==-1)
+                    filter_indices = minus1_indices + nan_indices
+                    x_list_plot = x_list_plot[~filter_indices]
+                    y_list = y_list[~filter_indices]
+                    n_list = n_list[~filter_indices]
+
                 plot_ax.plot(x_list_plot, y_list, marker='o', label=label, color=colors[counter])
                 if len(x_list_plot)>1:
                     counter += 1
@@ -245,6 +254,7 @@ def on_button_click():
 
     showlegend = checkbox_legend.isChecked()
     showcritn = checkbox_critn.isChecked()
+    nominus1 = checkbox_nominus1.isChecked()
     crit_values = useful_recurring_functions.parse_modes(crit_value_edit.text())
 
     text_values = []
@@ -253,7 +263,7 @@ def on_button_click():
 
     # Update the plot with new data
     try:
-        run(text_values, y_parameter, crit, crit_values, list_consid_mode, showcritn, showlegend, whichxparameter, x_label, is_frac)
+        run(text_values, y_parameter, crit, crit_values, list_consid_mode, showcritn, showlegend, whichxparameter, x_label, is_frac, nominus1)
     except Exception as e:
         print()
         print(f'    AN EXCEPTION WAS RAISED: {e}')
@@ -322,7 +332,7 @@ if __name__ == '__main__':
     check_all_button.clicked.connect(checkAll)
     none_button.clicked.connect(uncheckAll)
     n_label = QLabel("n")
-    checkboxes_n = [QCheckBox(str(n_value)) for n_value in [1, 2, 3, 4, 5, 7, 10, 20, 30, 40, 50]]
+    checkboxes_n = [QCheckBox(str(n_value)) for n_value in [1, 2, 3, 4, 5, 7, 10, 15, 20, 30, 40, 50]]
     for checkbox in checkboxes_n:
         checkbox.setChecked(True)
 
@@ -361,6 +371,7 @@ if __name__ == '__main__':
     empty_label = QLabel("")
     checkbox_legend = QCheckBox('Legend')
     checkbox_critn = QCheckBox("Critical n")
+    checkbox_nominus1 = QCheckBox("Remove -1")
 
     # Create a button
     plot_button = QPushButton('Plot')
@@ -422,6 +433,7 @@ if __name__ == '__main__':
     rest_layout.addWidget(empty_label)
     rest_layout.addWidget(checkbox_legend)
     rest_layout.addWidget(checkbox_critn)
+    rest_layout.addWidget(checkbox_nominus1)
 
     button_layout = QVBoxLayout()
     button_layout.addWidget(plot_button)

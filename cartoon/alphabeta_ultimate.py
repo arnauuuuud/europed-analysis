@@ -37,12 +37,10 @@ for shot, dda in zip(list_shot, list_dda):
         marker = 's'
         color = 'blue'
         i=0
-        continue
     elif gasrate <= 1.5e22:
         marker = 'o'
         color = 'green'
         i=1
-        continue
     else:
         marker = '^'
         color = 'magenta'
@@ -57,12 +55,18 @@ for shot, dda in zip(list_shot, list_dda):
 
     for (eta,marker) in zip([0,1],['*','D']):
         try:
-            europed_name = f'global_{shot}_eta{eta}_betan{round_betan}_neped{round_neped}_nesepneped{round_frac}'
+            europed_name = f'global_v3_{shot}_eta{eta}_betan{round_betan}_neped{round_neped}_nesepneped{round_frac}'
             
 
-            nesepneped = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, list_consid_mode=list_consid_mode)
+            nesepneped = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, list_consid_mode=list_consid_mode, q_ped_def='product')
+            neped = pedestal_values.pedestal_value_all_definition('ne',europed_name, crit=crit, crit_value=crit_value, list_consid_mode=list_consid_mode, q_ped_def='product')
+            neped2 = pedestal_values.pedestal_value_all_definition('ne',europed_name, crit=crit, crit_value=crit_value, list_consid_mode=list_consid_mode, q_ped_def='tepos-delta')
+
+            print('\n\n\n')
             print(europed_name)
             print(nesepneped)
+            print(neped)
+            print(neped2)
 
             betan_list = europed_analysis_2.get_x_parameter(europed_name, 'betan')
             alpha_list = europed_analysis_2.get_x_parameter(europed_name, 'alpha_helena_max')
