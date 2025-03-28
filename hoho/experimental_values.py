@@ -125,6 +125,13 @@ def get_width_pe(shot, dda):
     wp_error = np.sqrt(wn_error**2 + wt_error**2)/2
     return wp, wp_error
 
+def get_width_pe_hrts(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,wp_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='WPP1')
+    wp = wp_array[0]
+    return wp
+
+
 
 def get_teped(shot, dda):
     ppfuid('lfrassin')
@@ -295,6 +302,18 @@ def get_alpha_profile(shot, dda):
     # alpha = out['alpha']
     return psi_N, alpha
 
+
+
+def get_zeff(shot, dda):
+    ihdat,iwdat,t1,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='KT1')
+    ihdat,iwdat,t2,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='KT2')
+    t1 = t1[0]
+    t2 = t2[0]
+    ppfuid('JETPPF')
+    ihdat,iwdat,zeff,x,time_zeff,ier=ppfget(pulse=shot,dda='KS3',dtyp='ZEFV') 
+    timez_filtered = (time_zeff>t1) & (time_zeff<t2)
+    zeff_0 = np.nanmean(zeff[timez_filtered]) 
+    return zeff_0
 
 def get_alpha_max(shot, dda):
     ppfuid('lfrassin')
@@ -535,6 +554,114 @@ def get_peped(shot, dda):
     pos = tepos-delta/2
     interpolator_pe = interp1d(psil,pl)
     peped = interpolator_pe(pos)
+    return peped, peped_error 
+
+
+
+def get_peped_1delta(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,teped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HT1')
+    teped, teped_error = teped_array[0], teped_array[1]
+    ihdat,iwdat,neped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HN1')
+    neped, neped_error = neped_array[0], neped_array[1]
+    peped = 1.6 * neped * teped
+    peped_error = np.sqrt((neped_error/neped)**2 + (teped_error/teped)**2) * peped    
+
+
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,density_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='NEF3')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi_fit = np.array(psi_fit) + 1 - psi_sep
+    temperature_fit = np.array(temperature_fit)
+    density_fit = np.array(density_fit)
+
+    pressure_fit = 1.6*density_fit*temperature_fit
+
+    width = get_width_pe_hrts(shot,dda)
+
+    interpolator_pe = interp1d(psi_fit,pressure_fit)
+    peped = interpolator_pe(1-width)
+    zeff = get_zeff(shot, dda)
+
+    peped = (5-zeff)/2 * peped
+    peped_error = 0
+
+    return peped, peped_error  
+
+
+def get_peped_withdilution(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,teped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HT1')
+    teped, teped_error = teped_array[0], teped_array[1]
+    ihdat,iwdat,neped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HN1')
+    neped, neped_error = neped_array[0], neped_array[1]
+
+    zeff = get_zeff(shot, dda)
+
+    peped = 1.6 * neped * (5-zeff)/2 * teped
+    peped_error = np.sqrt((neped_error/neped)**2 + (teped_error/teped)**2) * peped    
+    return peped, peped_error
+
+def get_peped_straightHRTS(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,pressure_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PRF1')
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi_fit = np.array(psi_fit) + 1 - psi_sep
+    width = get_width_pe_hrts(shot,dda)
+
+    interpolator_pe = interp1d(psi_fit,pressure_fit)
+    peped = interpolator_pe(1-width)
+    zeff = get_zeff(shot, dda)
+
+    peped = (5-zeff)/2 * peped
+    peped_error = 0
+
+    return peped, peped_error 
+
+
+def get_peped_product(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,teped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HT1')
+    teped, teped_error = teped_array[0], teped_array[1]
+    ihdat,iwdat,neped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HN1')
+    neped, neped_error = neped_array[0], neped_array[1]
+    peped = 1.6 * neped * teped
+    peped_error = np.sqrt((neped_error/neped)**2 + (teped_error/teped)**2) * peped    
+    return peped, peped_error 
+
+def get_peped_fixedpos(shot, dda):
+    ppfuid('lfrassin')
+    ihdat,iwdat,teped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HT1')
+    teped, teped_error = teped_array[0], teped_array[1]
+    ihdat,iwdat,neped_array,x,time,ier = ppfget(pulse=shot, dda=dda, dtyp='HN1')
+    neped, neped_error = neped_array[0], neped_array[1]
+    peped = 1.6 * neped * teped
+    peped_error = np.sqrt((neped_error/neped)**2 + (teped_error/teped)**2) * peped    
+
+
+
+    ihdat,iwdat,temperature_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='TEF5')
+    ihdat,iwdat,density_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='NEF3')
+    ihdat,iwdat,psi_fit,x,time,ier=ppfget(pulse=shot,dda=dda,dtyp='PSIF')
+    interp = interp1d(temperature_fit, psi_fit)
+    psi_sep = interp(0.1)
+    psi_fit = np.array(psi_fit) + 1 - psi_sep
+    temperature_fit = np.array(temperature_fit)
+    density_fit = np.array(density_fit)
+
+    indexes = np.where(psi_fit>0.7)
+
+    psil = psi_fit[indexes]
+    nl = density_fit[indexes]
+    tl = temperature_fit[indexes]
+    pl = nl * tl * 1.6
+    interpolator_pe = interp1d(psil,pl)
+    peped = interpolator_pe(0.8)
 
 
     return peped, peped_error 
@@ -641,6 +768,16 @@ def get_values(par, shot, dda='0', t0=0, time_range=[0,0]):
         value, value_error = get_nesepneped(shot, dda)
     elif par == 'peped':
         value, value_error = get_peped(shot, dda)
+    elif par == 'peped_product':
+        value, value_error = get_peped_product(shot, dda)
+    elif par == 'peped_fixedpos':
+        value, value_error = get_peped_fixedpos(shot, dda)
+    elif par == 'peped_withdilution':
+        value, value_error = get_peped_withdilution(shot, dda)
+    elif par == 'peped_1delta':
+        value, value_error = get_peped_1delta(shot, dda)
+    elif par == 'peped_HRTS':
+        value, value_error = get_peped_straightHRTS(shot, dda)
     elif par == 'teped':
         value, value_error = get_teped(shot, dda)
     elif par == 'neped':
@@ -661,3 +798,22 @@ def get_values(par, shot, dda='0', t0=0, time_range=[0,0]):
         value, value_error = get_width_pe(shot, dda)
 
     return value, value_error
+
+
+
+def get_color(shot, dda):
+    gasrate, g_err = get_gasrate(shot, dda)
+
+    if gasrate <= 0.5e22:
+        marker = 's'
+        color = 'blue'
+        i = 0
+    elif gasrate <= 1.5e22:
+        marker = 'o'
+        color = 'green'
+        i = 1
+    else:
+        marker = '^'
+        color = 'magenta'
+        i = 2
+    return color

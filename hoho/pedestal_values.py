@@ -88,6 +88,9 @@ def critical_profile_number(europed_name, crit='alfven', crit_value=0.03, exclud
     if crit =='diamag':
         dict_gammas = europed_analysis_2.remove_wrong_slope(dict_gammas)
     has_unstable, delta_crit, mode = europed_analysis_2.find_critical(deltas, deltas, dict_gammas, crit_value)
+    if mode == -1:
+        return None, None, None
+
     try:
         delta_below = np.max([d for d in deltas if d <= delta_crit])
     except ValueError:

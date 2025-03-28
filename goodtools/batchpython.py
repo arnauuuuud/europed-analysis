@@ -1,5 +1,5 @@
 #!/usr/local/depot/Python-3.7/bin/python3
-from pylib.misc import BatchRun
+from jetlib.misc import BatchRun
 import sys
 import os
 # First argument should be filepath of python file to run in batch

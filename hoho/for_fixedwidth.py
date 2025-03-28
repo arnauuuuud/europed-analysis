@@ -27,7 +27,7 @@ def plot_line_threshold(ax, europed_name, color, crit_values, crit, q_ped_def, x
     ax.plot(x_filt, y_filt, color=color, linewidth=0.5, zorder=-1, marker='+')
 
 
-def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def, exclude_modes=[]):
+def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def, exclude_modes=None, list_consid_mode=None):
     try:
         fixed_width = europed_name.startswith('fw')
 
@@ -37,40 +37,40 @@ def give_critx_crity(europed_name, crit, crit_value, xy, q_ped_def, exclude_mode
         if xy == 'alphapeped':
             xs = hdf5_data.get_xparam(europed_name, 'alpha_helena_max')
             # ys = hdf5_data.get_xparam(europed_name, 'peped',q_ped_def)
-            crit_y_def = pedestal_values.pedestal_value_all_definition('pe', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
+            crit_y_def = pedestal_values.pedestal_value_all_definition('pe', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
 
         elif xy == 'nepedteped':
             # xs = hdf5_data.get_xparam(europed_name, 'neped',q_ped_def)
             # ys = hdf5_data.get_xparam(europed_name, 'teped', q_ped_def)
-            crit_x_def = pedestal_values.pedestal_value_all_definition('ne', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
-            crit_y_def = pedestal_values.pedestal_value_all_definition('te', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
+            crit_x_def = pedestal_values.pedestal_value_all_definition('ne', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
+            crit_y_def = pedestal_values.pedestal_value_all_definition('te', europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
 
         elif xy == 'sepedwidth':
-            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
+            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
             ys = hdf5_data.get_xparam(europed_name, 'delta', q_ped_def)
 
         elif xy == 'sepedwidthbis':
-            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes)
-            crit_y_def = pedestal_values.get_fit_width(europed_name, q='pe', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
+            crit_x_def = pedestal_values.nesep_neped(europed_name, crit=crit, crit_value=crit_value, q_ped_def=q_ped_def, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
+            crit_y_def = pedestal_values.get_fit_width(europed_name, q='pe', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
 
         elif xy == 'deltadelta':
-            crit_x_def = pedestal_values.get_fit_width(europed_name, q='ne', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
-            crit_y_def = pedestal_values.get_fit_width(europed_name, q='te', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
+            crit_x_def = pedestal_values.get_fit_width(europed_name, q='ne', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
+            crit_y_def = pedestal_values.get_fit_width(europed_name, q='te', crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
 
         elif xy == 'betapbetan':
             xs = hdf5_data.get_xparam(europed_name, 'betap')
             ys = hdf5_data.get_xparam(europed_name, 'betan')
 
         elif xy == 'relshrelsh':
-            crit_x_def = pedestal_values.get_fit_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
-            crit_y_def = pedestal_values.get_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes)
+            crit_x_def = pedestal_values.get_fit_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
+            crit_y_def = pedestal_values.get_rs(europed_name, crit=crit, crit_value=crit_value, fixed_width=fixed_width, exclud_mode=exclude_modes, list_consid_mode=list_consid_mode)
 
         
         deltas = hdf5_data.get_xparam(europed_name, 'betaped')  if fixed_width else hdf5_data.get_xparam(europed_name, 'delta') 
  
 
         dict_gamma = europed_analysis_2.get_gammas(europed_name, crit, fixed_width)
-        dict_gamma = europed_analysis_2.filter_dict(dict_gamma, exclud_mode=exclude_modes)
+        dict_gamma = europed_analysis_2.filter_dict(dict_gamma, exclud_mode=exclude_modes, interesting_modes=list_consid_mode)
         if crit == 'diamag':
             dict_gamma = europed_analysis_2.remove_wrong_slope(dict_gamma)
 

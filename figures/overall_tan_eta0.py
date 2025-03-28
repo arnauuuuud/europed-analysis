@@ -20,10 +20,10 @@ matplotlib.rcParams['font.family'] = 'sans-serif'
 cm = 1/2.54
 
 crit_value_ideal = 0.03
-crit_value_resis = 0.1
+crit_value_resis = 0.08
 marker_ideal = 'o'
 marker_resistive = 's'
-q_ped_def = 'tepos-delta'
+q_ped_def = 'positionTeped'
 
 # xy = 'alphapeped'
 # xy = 'nepedteped'
@@ -44,10 +44,19 @@ def main(xy, ax):
     # for europed_name in ['tan_eta1_rs0.018_neped2.67_betap1.35']:
     #     for_fixedwidth.plot(ax, europed_name, 'red', 0.09, crit, q_ped_def, '^', False, xy=xy)  
     #     for_fixedwidth.plot(ax, europed_name, 'red', 0.1, crit, q_ped_def, '^', False, xy=xy) 
-    for europed_name in ['tan_eta0_rs0.018_neped2.67_betap1.35_kbm0116']:
-        for_fixedwidth.plot(ax, europed_name, 'blue', 0.03, crit, q_ped_def, '^', False, xy=xy)  
-    for europed_name in ['tan_eta0_frac0.33_neped2.67_betap1.35_kbm0116_mishka']:
-        for_fixedwidth.plot(ax, europed_name, 'red', 0.03, crit, q_ped_def, '^', False, xy=xy)  
+    # for europed_name in ['tan_eta0_rs0.018_neped2.67_betap1.35_kbm0116']:
+    #     for_fixedwidth.plot(ax, europed_name, 'blue', 0.03, crit, q_ped_def, '^', False, xy=xy)  
+    for europed_name in ['global_v4_84794_eta1_betan3.07_neped2.55_nesepneped0.33']:
+        for_fixedwidth.plot(ax, europed_name, 'red', 0.09, crit, q_ped_def, '^', False, xy=xy)  
+    for europed_name in ['global_v4_87342_eta1_betan2.12_neped2.72_nesepneped0.57']:
+        for_fixedwidth.plot(ax, europed_name, 'blue', 0.09, crit, q_ped_def, '^', False, xy=xy)  
+    exclude_modes = [30,40,50]
+    for europed_name in ['global_v4_84794_eta1_betan3.07_neped2.55_nesepneped0.33']:
+        for_fixedwidth.plot(ax, europed_name, 'red', 0.07, crit, q_ped_def, 's', False, xy=xy, exclude_modes=exclude_modes) 
+    for europed_name in ['global_v4_87342_eta1_betan2.12_neped2.72_nesepneped0.57']:
+        for_fixedwidth.plot(ax, europed_name, 'blue', 0.07, crit, q_ped_def, 's', False, xy=xy, exclude_modes=exclude_modes)    
+    # for europed_name in ['tan_eta0_rs0.022_neped2.57_betap1.3']:
+    #     for_fixedwidth.plot(ax, europed_name, 'red', 0.03, crit, q_ped_def, '^', False, xy=xy)  
     # for europed_name in ['tan_eta1_rs0.022_neped2.6_betap1.35']:
     #     for_fixedwidth.plot(ax, europed_2_neped2.6_betap1.35']:
     #     for_fixedwidth.plot(ax, europed_name, 'red', 0.01, crit, q_ped_def, '^', False, xy=xy)  

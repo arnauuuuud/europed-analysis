@@ -1,5 +1,5 @@
 import numpy as np
-import py_flush as Flush
+# import py_flush as Flush
 from scipy.interpolate import interp1d
 
 def ra_flush_v3(pulse, time, r, z, UID='JETPPF', DDA='EFTP', seq='0'):

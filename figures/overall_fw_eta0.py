@@ -36,9 +36,13 @@ def plot(ax, europed_name, color, crit_value, marker = 'o', open_markers=False, 
 
 def main(xy, ax):
     for europed_name in ['fwo_eta0_rs0.018_neped2.67_betap1.35_w0.063']:
-        plot(ax, europed_name, 'blue', crit_value, 'o', False, xy=xy) 
-    for europed_name in ['fwi_eta0_rs0.04_neped2.85_betap0.95_w0.07']:
-        plot(ax, europed_name, 'green', crit_value, 's', False, xy=xy)   
+        plot(ax, europed_name, 'blue', crit_value, 'o', False, xy=xy)  
+    for europed_name in ['fwo_eta0_rs0.023_neped2.65_betap1.35_w0.063']:
+        plot(ax, europed_name, 'blue', crit_value, 'o', False, xy=xy)    
+    for europed_name in ['fwo_eta0_rs0.028_neped2.65_betap1.35_w0.063']:
+        plot(ax, europed_name, 'blue', crit_value, 'o', False, xy=xy)    
+    for europed_name in ['fwo_eta0_rs0.033_neped2.65_betap1.35_w0.063']:
+        plot(ax, europed_name, 'blue', crit_value, 'o', False, xy=xy)  
 
     # for europed_name in ['fwo_eta1_rs0.04_neped2.85_betap0.95_w0.07']:
     #     plot(ax, europed_name, 'gold', crit_value, marker_resistive, True, xy=xy)   

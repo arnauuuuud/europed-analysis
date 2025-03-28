@@ -9,6 +9,7 @@ def parse_list_modes(mode_str):
     return res
 
 def parse_delta(str):
+    print('its here')
     if ',' in str:
         return [float(delta) for delta in str.split(',')]
     elif '-' in str:
@@ -17,6 +18,8 @@ def parse_delta(str):
         step_size = 0.001
         deltas = np.arange(delta_min, delta_max + step_size, step_size)
         return deltas
+    elif '^' in str:
+        return [float(delta) for delta in str.split('^')] + ['+']
     else:
         return [float(str)]
     

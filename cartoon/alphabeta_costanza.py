@@ -34,7 +34,57 @@ colors = []
 #     gasrate, g_err = experimental_values.get_gasrate(shot, dda)
 #     betan, g_err = experimental_values.get_betan(shot, dda)
 
-#     if not betan<1.6:
+#     if gasrate <= 0.5e22:
+#         marker = 's'
+#         color = 'blue'
+#         i = 0
+#     elif gasrate <= 1.5e22:
+#         marker = 'o'
+#         color = 'green'
+#         i = 1
+#     else:
+#         marker = '^'
+#         color = 'magenta'
+#         i = 2
+#     # colors.append(color)
+#     markers.append(marker)
+#     ax.scatter(nesepneped,alpha,c=color, marker=marker)
+#     lists.append((nesepneped,alpha))
+
+
+# lbeta = np.array([l[0] for l in lists])
+# lalph = [l[1] for l in lists]
+# model1 = LinearRegression()
+# lbeta = lbeta.reshape(-1, 1)
+# model1.fit(lbeta, lalph)
+# lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
+# lalph_to_plot = model1.predict(lbeta_to_plot)
+
+# ax.plot(lbeta_to_plot, lalph_to_plot, c='black')
+
+# ax.set_xlabel(global_functions.nesepneped_label)
+# ax.set_ylabel(global_functions.alpha_label)
+# ax.set_ylim(bottom=0)
+# ax.set_xlim(left=0)
+# plt.show()
+
+
+
+# fig, ax = plt.subplots()
+
+
+# colors = []
+# markers = []
+
+# lists = []
+
+# for shot, dda in zip(list_shot, list_dda):
+#     alpha, a_err = experimental_values.get_alpha_max(shot, dda)
+#     nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
+#     gasrate, g_err = experimental_values.get_gasrate(shot, dda)
+#     power, g_err = experimental_values.get_power(shot, dda)
+
+#     if not power<6*1e6:
 #         continue
 
 
@@ -74,243 +124,188 @@ colors = []
 # plt.show()
 
 
-
-fig, ax = plt.subplots()
-
-
-colors = []
-markers = []
-
-lists = []
-
-for shot, dda in zip(list_shot, list_dda):
-    alpha, a_err = experimental_values.get_alpha_max(shot, dda)
-    nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
-    gasrate, g_err = experimental_values.get_gasrate(shot, dda)
-    power, g_err = experimental_values.get_power(shot, dda)
-
-    if not power<6*1e6:
-        continue
+# fig, ax = plt.subplots()
 
 
+# colors = []
+# markers = []
 
-    if gasrate <= 0.5e22:
-        marker = 's'
-        color = 'blue'
-        i = 0
-    elif gasrate <= 1.5e22:
-        marker = 'o'
-        color = 'green'
-        i = 1
-    else:
-        marker = '^'
-        color = 'magenta'
-        i = 2
-    # colors.append(color)
-    markers.append(marker)
-    ax.scatter(nesepneped,alpha,c=color, marker=marker)
-    lists.append((nesepneped,alpha))
+# lists = []
 
+# for shot, dda in zip(list_shot, list_dda):
+#     alpha, a_err = experimental_values.get_alpha_max(shot, dda)
+#     nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
+#     gasrate, g_err = experimental_values.get_gasrate(shot, dda)
+#     power, g_err = experimental_values.get_power(shot, dda)
 
-lbeta = np.array([l[0] for l in lists])
-lalph = [l[1] for l in lists]
-model1 = LinearRegression()
-lbeta = lbeta.reshape(-1, 1)
-model1.fit(lbeta, lalph)
-lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
-lalph_to_plot = model1.predict(lbeta_to_plot)
-
-ax.plot(lbeta_to_plot, lalph_to_plot, c='black')
-
-ax.set_xlabel(global_functions.nesepneped_label)
-ax.set_ylabel(global_functions.alpha_label)
-ax.set_ylim(bottom=0)
-ax.set_xlim(left=0)
-plt.show()
-
-
-fig, ax = plt.subplots()
-
-
-colors = []
-markers = []
-
-lists = []
-
-for shot, dda in zip(list_shot, list_dda):
-    alpha, a_err = experimental_values.get_alpha_max(shot, dda)
-    nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
-    gasrate, g_err = experimental_values.get_gasrate(shot, dda)
-    power, g_err = experimental_values.get_power(shot, dda)
-
-    if not power>10*1e6:
-        continue
+#     if not power>10*1e6:
+#         continue
 
 
 
-    if gasrate <= 0.5e22:
-        marker = 's'
-        color = 'blue'
-        i = 0
-    elif gasrate <= 1.5e22:
-        marker = 'o'
-        color = 'green'
-        i = 1
-    else:
-        marker = '^'
-        color = 'magenta'
-        i = 2
-    # colors.append(color)
-    markers.append(marker)
-    ax.scatter(nesepneped,alpha,c=color, marker=marker)
-    lists.append((nesepneped,alpha))
+#     if gasrate <= 0.5e22:
+#         marker = 's'
+#         color = 'blue'
+#         i = 0
+#     elif gasrate <= 1.5e22:
+#         marker = 'o'
+#         color = 'green'
+#         i = 1
+#     else:
+#         marker = '^'
+#         color = 'magenta'
+#         i = 2
+#     # colors.append(color)
+#     markers.append(marker)
+#     ax.scatter(nesepneped,alpha,c=color, marker=marker)
+#     lists.append((nesepneped,alpha))
 
 
-lbeta = np.array([l[0] for l in lists])
-lalph = [l[1] for l in lists]
-model1 = LinearRegression()
-lbeta = lbeta.reshape(-1, 1)
-model1.fit(lbeta, lalph)
-lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
-lalph_to_plot = model1.predict(lbeta_to_plot)
+# lbeta = np.array([l[0] for l in lists])
+# lalph = [l[1] for l in lists]
+# model1 = LinearRegression()
+# lbeta = lbeta.reshape(-1, 1)
+# model1.fit(lbeta, lalph)
+# lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
+# lalph_to_plot = model1.predict(lbeta_to_plot)
 
-ax.plot(lbeta_to_plot, lalph_to_plot, c='black')
+# ax.plot(lbeta_to_plot, lalph_to_plot, c='black')
 
-ax.set_xlabel(global_functions.nesepneped_label)
-ax.set_ylabel(global_functions.alpha_label)
-ax.set_ylim(bottom=0)
-ax.set_xlim(left=0)
-plt.show()
+# ax.set_xlabel(global_functions.nesepneped_label)
+# ax.set_ylabel(global_functions.alpha_label)
+# ax.set_ylim(bottom=0)
+# ax.set_xlim(left=0)
+# plt.show()
 
-fig, ax = plt.subplots()
-
-
-colors = []
-markers = []
-
-lists = []
-
-for shot, dda in zip(list_shot, list_dda):
-    alpha, a_err = experimental_values.get_alpha_max(shot, dda)
-    nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
-    gasrate, g_err = experimental_values.get_gasrate(shot, dda)
-    betan, g_err = experimental_values.get_betan(shot, dda)
-
-    if not (betan>1.85 and betan<2.2):
-        continue
+# fig, ax = plt.subplots()
 
 
+# colors = []
+# markers = []
 
-    if gasrate <= 0.5e22:
-        marker = 's'
-        color = 'blue'
-        i = 0
-    elif gasrate <= 1.5e22:
-        marker = 'o'
-        color = 'green'
-        i = 1
-    else:
-        marker = '^'
-        color = 'magenta'
-        i = 2
-    # colors.append(color)
-    markers.append(marker)
-    ax.scatter(nesepneped,alpha,c=color, marker=marker)
-    lists.append((nesepneped,alpha))
+# lists = []
+
+# for shot, dda in zip(list_shot, list_dda):
+#     alpha, a_err = experimental_values.get_alpha_max(shot, dda)
+#     nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
+#     gasrate, g_err = experimental_values.get_gasrate(shot, dda)
+#     betan, g_err = experimental_values.get_betan(shot, dda)
+
+#     if not (betan>1.85 and betan<2.2):
+#         continue
 
 
-lbeta = np.array([l[0] for l in lists])
-lalph = [l[1] for l in lists]
-model1 = LinearRegression()
-lbeta = lbeta.reshape(-1, 1)
-model1.fit(lbeta, lalph)
-lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
-lalph_to_plot = model1.predict(lbeta_to_plot)
 
-ax.plot(lbeta_to_plot, lalph_to_plot, c='black')
-
-ax.set_xlabel(global_functions.nesepneped_label)
-ax.set_ylabel(global_functions.alpha_label)
-ax.set_ylim(bottom=0)
-ax.set_xlim(left=0)
-plt.show()
-
-
-fig, axs = plt.subplots(1,2)
-ax1 = axs[0]
-ax2 = axs[1]
-
-norm = Normalize(vmin=0, vmax=1)  # Normalize the data between -100 and 100
-cmap = cm.inferno_r  # Use the 'viridis' colormap
-# Create a scatter plot with colors mapped to 'z'
-colors = []
-markers = []
-
-lists = [[],[],[]]
-
-for shot, dda in zip(list_shot, list_dda):
-    print()
-    print(shot)
-    print(dda)
-    alpha, a_err = experimental_values.get_alpha_max(shot, dda)
-    power, p_err = experimental_values.get_power(shot, dda)
-    gasrate, g_err = experimental_values.get_gasrate(shot, dda)
-
-    y.append(alpha)
-    x.append(power)
-    nesepneped = experimental_values.get_nesepneped(shot, dda)[0]
-    color = cmap(norm(nesepneped))
-    colors.append(color)
-
-    if gasrate <= 0.5e22:
-        marker = 's'
-        color = 'blue'
-        i = 0
-    elif gasrate <= 1.5e22:
-        marker = 'o'
-        color = 'green'
-        i = 1
-    else:
-        marker = '^'
-        color = 'magenta'
-        i = 2
-    # colors.append(color)
-    markers.append(marker)
-    power = power*1e-6
-
-    print(alpha)
-    ax1.scatter(power,alpha,c=color, marker=marker)
-    ax2.scatter(power,nesepneped,c=color, marker=marker)
-    lists[i].append((power,alpha,nesepneped))
-
-colors_i = ['blue','green','magenta']
-for i in range(3):
-    ll = lists[i]
-    lbeta = np.array([l[0] for l in ll])
-    lalph = [l[1] for l in ll]
-    lfrac = [l[2] for l in ll]
-    model1 = LinearRegression()
-    model2 = LinearRegression()
-    lbeta = lbeta.reshape(-1, 1)
-    model1.fit(lbeta, lalph)
-    model2.fit(lbeta, lfrac)
-    lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
-    lalph_to_plot = model1.predict(lbeta_to_plot)
-    lfrac_to_plot = model2.predict(lbeta_to_plot)
-
-    ax1.plot(lbeta_to_plot, lalph_to_plot, c=colors_i[i])
-    ax2.plot(lbeta_to_plot, lfrac_to_plot, c=colors_i[i])
+#     if gasrate <= 0.5e22:
+#         marker = 's'
+#         color = 'blue'
+#         i = 0
+#     elif gasrate <= 1.5e22:
+#         marker = 'o'
+#         color = 'green'
+#         i = 1
+#     else:
+#         marker = '^'
+#         color = 'magenta'
+#         i = 2
+#     # colors.append(color)
+#     markers.append(marker)
+#     ax.scatter(nesepneped,alpha,c=color, marker=marker)
+#     lists.append((nesepneped,alpha))
 
 
-ax1.set_xlabel(r'$P_{\mathrm{[MW]}}$')
-ax1.set_ylabel(r'$\alpha_{\mathrm{max}}$')
-ax1.set_ylim(bottom=0)
-ax1.set_xlim(left=0)
-ax2.set_xlabel(r'$P_{\mathrm{[MW]}}$')
-ax2.set_ylabel(global_functions.nesepneped_label)
-ax2.set_ylim(bottom=0)
-ax2.set_xlim(left=0)
-plt.show()
+# lbeta = np.array([l[0] for l in lists])
+# lalph = [l[1] for l in lists]
+# model1 = LinearRegression()
+# lbeta = lbeta.reshape(-1, 1)
+# model1.fit(lbeta, lalph)
+# lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
+# lalph_to_plot = model1.predict(lbeta_to_plot)
+
+# ax.plot(lbeta_to_plot, lalph_to_plot, c='black')
+
+# ax.set_xlabel(global_functions.nesepneped_label)
+# ax.set_ylabel(global_functions.alpha_label)
+# ax.set_ylim(bottom=0)
+# ax.set_xlim(left=0)
+# plt.show()
+
+
+# fig, axs = plt.subplots(1,2)
+# ax1 = axs[0]
+# ax2 = axs[1]
+
+# norm = Normalize(vmin=0, vmax=1)  # Normalize the data between -100 and 100
+# cmap = cm.inferno_r  # Use the 'viridis' colormap
+# # Create a scatter plot with colors mapped to 'z'
+# colors = []
+# markers = []
+
+# lists = [[],[],[]]
+
+# for shot, dda in zip(list_shot, list_dda):
+#     print()
+#     print(shot)
+#     print(dda)
+#     alpha, a_err = experimental_values.get_alpha_max(shot, dda)
+#     power, p_err = experimental_values.get_power(shot, dda)
+#     gasrate, g_err = experimental_values.get_gasrate(shot, dda)
+
+#     y.append(alpha)
+#     x.append(power)
+#     nesepneped = experimental_values.get_nesepneped(shot, dda)[0]
+#     color = cmap(norm(nesepneped))
+#     colors.append(color)
+
+#     if gasrate <= 0.5e22:
+#         marker = 's'
+#         color = 'blue'
+#         i = 0
+#     elif gasrate <= 1.5e22:
+#         marker = 'o'
+#         color = 'green'
+#         i = 1
+#     else:
+#         marker = '^'
+#         color = 'magenta'
+#         i = 2
+#     # colors.append(color)
+#     markers.append(marker)
+#     power = power*1e-6
+
+#     print(alpha)
+#     ax1.scatter(power,alpha,c=color, marker=marker)
+#     ax2.scatter(power,nesepneped,c=color, marker=marker)
+#     lists[i].append((power,alpha,nesepneped))
+
+# colors_i = ['blue','green','magenta']
+# for i in range(3):
+#     ll = lists[i]
+#     lbeta = np.array([l[0] for l in ll])
+#     lalph = [l[1] for l in ll]
+#     lfrac = [l[2] for l in ll]
+#     model1 = LinearRegression()
+#     model2 = LinearRegression()
+#     lbeta = lbeta.reshape(-1, 1)
+#     model1.fit(lbeta, lalph)
+#     model2.fit(lbeta, lfrac)
+#     lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
+#     lalph_to_plot = model1.predict(lbeta_to_plot)
+#     lfrac_to_plot = model2.predict(lbeta_to_plot)
+
+#     ax1.plot(lbeta_to_plot, lalph_to_plot, c=colors_i[i])
+#     ax2.plot(lbeta_to_plot, lfrac_to_plot, c=colors_i[i])
+
+
+# ax1.set_xlabel(r'$P_{\mathrm{[MW]}}$')
+# ax1.set_ylabel(r'$\alpha_{\mathrm{max}}$')
+# ax1.set_ylim(bottom=0)
+# ax1.set_xlim(left=0)
+# ax2.set_xlabel(r'$P_{\mathrm{[MW]}}$')
+# ax2.set_ylabel(global_functions.nesepneped_label)
+# ax2.set_ylim(bottom=0)
+# ax2.set_xlim(left=0)
+# plt.show()
 
 fig, ax = plt.subplots()
 
@@ -324,12 +319,12 @@ for shot, dda in zip(list_shot, list_dda):
     neped, a_err = experimental_values.get_neped(shot, dda)
     nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
     gasrate, g_err = experimental_values.get_gasrate(shot, dda)
+    betan, g_err = experimental_values.get_betan(shot, dda)
+    alpha, g_err = experimental_values.get_alpha_max(shot, dda)
 
-    y.append(nesepneped)
-    x.append(neped)
-    nesepneped = experimental_values.get_nesepneped(shot, dda)[0]
-    color = cmap(norm(nesepneped))
-    colors.append(color)
+
+    x_here = betan
+    y_here = alpha
 
     if gasrate <= 0.5e22:
         marker = 's'
@@ -345,8 +340,8 @@ for shot, dda in zip(list_shot, list_dda):
         i = 2
     # colors.append(color)
     markers.append(marker)
-    ax.scatter(neped,nesepneped,c=color, marker=marker)
-    lists[i].append((neped,nesepneped))
+    ax.scatter(x_here,y_here,c=color, marker=marker)
+    lists[i].append((x_here,y_here))
 
 colors_i = ['blue','green','magenta']
 for i in range(3):
@@ -361,8 +356,63 @@ for i in range(3):
 
     ax.plot(lbeta_to_plot, lalph_to_plot, c=colors_i[i])
 
-ax.set_xlabel(global_functions.neped_label)
-ax.set_ylabel(global_functions.nesepneped_label)
+ax.set_xlabel(global_functions.betan_label)
+ax.set_ylabel(global_functions.alpha_label)
+ax.set_ylim(bottom=0)
+ax.set_xlim(left=0)
+plt.show()
+
+fig, ax = plt.subplots()
+
+
+colors = []
+markers = []
+
+lists = [[],[],[]]
+
+for shot, dda in zip(list_shot, list_dda):
+    neped, a_err = experimental_values.get_neped(shot, dda)
+    nesepneped, p_err = experimental_values.get_nesepneped(shot, dda)
+    gasrate, g_err = experimental_values.get_gasrate(shot, dda)
+    betan, g_err = experimental_values.get_betan(shot, dda)
+    alpha, g_err = experimental_values.get_alpha_max(shot, dda)
+
+
+    x_here = betan
+    y_here = alpha
+
+    if gasrate <= 0.5e22:
+        marker = 's'
+        color = 'blue'
+        i = 0
+    elif gasrate <= 1.5e22:
+        marker = 'o'
+        color = 'green'
+        i = 1
+    else:
+        marker = '^'
+        color = 'magenta'
+        i = 2
+    # colors.append(color)
+    markers.append(marker)
+    ax.scatter(x_here,y_here,c=color, marker=marker)
+    lists[i].append((x_here,y_here))
+
+colors_i = ['blue','green','magenta']
+for i in range(3):
+    ll = lists[i]
+    lbeta = np.array([l[0] for l in ll])
+    lalph = [l[1] for l in ll]
+    model1 = LinearRegression()
+    lbeta = lbeta.reshape(-1, 1)
+    model1.fit(lbeta, lalph)
+    lbeta_to_plot = np.linspace(min(lbeta),max(lbeta),2).reshape(-1,1)
+    lalph_to_plot = model1.predict(lbeta_to_plot)
+
+    ax.plot(lbeta_to_plot, lalph_to_plot, c=colors_i[i])
+
+ax.set_xlabel(global_functions.betan_label)
+ax.set_ylabel(global_functions.pep)
 ax.set_ylim(bottom=0)
 ax.set_xlim(left=0)
 plt.show()

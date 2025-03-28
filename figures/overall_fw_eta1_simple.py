@@ -40,6 +40,8 @@ def main(xy, ax):
         plot(ax, europed_name, 'blue', crit_value, 'o', False, xy=xy) 
     for europed_name in ['fwi_eta1_rs0.04_neped2.85_betap0.95_w0.07']:
         plot(ax, europed_name, 'green', crit_value, 's', False, xy=xy)   
+    for europed_name in ['fwi_eta1_rs0.04_neped2.85_betap0.95_w0.07']:
+        plot(ax, europed_name, 'green', crit_value, 's', False, xy=xy)   
 
     # for europed_name in ['fwo_eta1_rs0.04_neped2.85_betap0.95_w0.07']:
     #     plot(ax, europed_name, 'gold', crit_value, marker_resistive, True, xy=xy)   

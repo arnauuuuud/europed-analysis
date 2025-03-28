@@ -106,10 +106,15 @@ def merge(original_name, extension_name, option, modes, deltas_to_put, is_fixed_
             new_group = extension_file['scan'][profile]
             delta_extension = round(float(new_group['delta'][0]),5) if not is_fixed_width else round(float(new_group['betaped'][0]),5)
 
+            if len(deltas_to_put) == 3 and deltas_to_put[-1] == '+':
+                deltas_to_put_here = [delta_extension] if delta_extension >= deltas_to_put[0] and delta_extension <= deltas_to_put[1] else [0]
+            else:
+                deltas_to_put_here = deltas_to_put
+
             # if delta is not in the list of interesting deltas, pass
-            if all(abs(delta_extension-delta)>0.0001 for delta in deltas_to_put):
+            if all(abs(delta_extension-delta)>0.0001 for delta in deltas_to_put_here):
                 print(delta_extension)
-                print(deltas_to_put)
+                print(deltas_to_put_here)
                 print('yessss')
                 continue
 

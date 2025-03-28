@@ -18,7 +18,7 @@ fontsizetick = constants.fontsizetick
 fontsizetext = constants.fontsizetext
 
 #####################################################################
-europed_name = 'tan_eta0_rs0.022_neped2.57_betap1.3'
+europed_name = 'global_v4_84794_eta0_betan3.07_neped2.55_nesepneped0.33'
 crit = 'alfven'
 crit_value = 0.03
 fixed_width = False
@@ -29,6 +29,7 @@ shot = 84794
 dda = 'T052'
 markersize = 20
 alpha = 0.5
+folder_to_save = '/home/jwp9427/work/figures/2025-03-05_paper/'
 
 fig, axs = plt.subplots(1, 3)
 
@@ -72,4 +73,5 @@ axs[2].set_ylim(bottom=0, top=8)
 
 
 
+plt.savefig(folder_to_save+'1.png')
 plt.show()

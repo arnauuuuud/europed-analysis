@@ -1,5 +1,5 @@
 import numpy as np
-import py_flush as Flush
+# import py_flush as Flush
 
 def ra_flush_v3_fast(pulse, time, r, z, psi_norm=None, btot=None, corr_bt=1, UID='JETPPF', DDA='EFIT', seq='0'):
     time = float(time)

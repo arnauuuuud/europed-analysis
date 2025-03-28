@@ -31,18 +31,25 @@ colormedgas = 'green'
 colorhighgas = 'magenta'
 
 colorHPLG = colorlowgas
+colorHPHG = colorhighgas
 
 linestyle_n50 = '-'
 linestyle_n20 = ':'
 
-color_eta0 = 'orange'
-color_eta1 = 'purple'
+color_eta0 = 'coral'
+color_eta1 = 'green'
 
-color_n20 = 'darkred'
+color_n20 = 'lightgreen'
 linestyle_n20 = 'dashdot'
-color_n50 = 'coral'
+color_n50 = 'darkgreen'
 
-linestyle_t01 = '-'
+cmap = LinearSegmentedColormap.from_list('custom_gradient', [color_n20, color_n50], N=256)
+color_n30 = cmap(1/3)
+print(color_n30)
+color_n40 = cmap(2/3)
+
+
+linestyle_t01 = 'dashdot'
 linestyle_t003 = '--'
 
 # cmap = LinearSegmentedColormap.from_list("orange_darkred", colors)

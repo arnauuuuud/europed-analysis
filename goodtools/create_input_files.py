@@ -9,7 +9,7 @@ list_shotno = dict_shot_dda.keys()
 
 # list_shotno = [84794]
 
-for shot in list(list_shotno)[::3]:
+for shot in list(list_shotno)[2::3]:
 
     dda = dict_shot_dda[shot]
 
@@ -22,7 +22,7 @@ for shot in list(list_shotno)[::3]:
         round_betan = round(float(betan), 2)
         round_neped = round(float(neped), 2)
         round_frac = round(nesepneped, 2)
-        runname = f'global_v3_{shot}_eta{eta}_betan{round_betan}_neped{round_neped}_nesepneped{round_frac}'
+        runname = f'global_v4_{shot}_eta{eta}_betan{round_betan}_neped{round_neped}_nesepneped{round_frac}'
 
         dict_setinput = {
             'run_name':runname,
@@ -33,7 +33,7 @@ for shot in list(list_shotno)[::3]:
             'n':'10,20,50'
         }
 
-        setinput.main('global_v3', **dict_setinput)
+        setinput.main('global_v4', **dict_setinput)
         add_to_waitinglist.main([runname])
 
 

@@ -38,6 +38,21 @@ j_label = r'$j$'
 delta_ne_label = r'${\Delta(n_e)}_{[\psi_N]}$'
 power_label = r'$P_{\mathrm{[MW]}}$'
 gasrate_label = r'$\Gamma_{[e.s^{-1}]}$'
+gammaalfven_label = r'$\gamma / \omega_A$'
+
+
+
+def get_label(parameter):
+    if parameter == 'betan':
+        return betan_label
+    if 'peped' in parameter:
+        return peped_label
+    if parameter == 'neped':
+        return neped_label
+    if parameter in ['alpha','alpha_max']:
+        return alpha_label
+    if parameter in ['nesepneped','frac']:
+        return nesepneped_label
 
 def get_plot_labels_gamma_profiles(x_parameter, crit):
     """translates the parameters to plot labels"""
